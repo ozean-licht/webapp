@@ -18,16 +18,23 @@ const resend = new Resend(resendApiKey);
 
 serve(async (req) => {
   if (req.method === 'POST') {
+    console.log('Received webhook request');
+
     // Validate required environment variables
     if (!hookSecret) {
       console.error('SEND_EMAIL_HOOK_SECRET is not configured');
       return new Response('Server configuration error', { status: 500 });
     }
 
+    console.log('Hook secret is configured, length:', hookSecret.length);
+
     const payload = await req.text();
+    console.log('Payload received, length:', payload.length);
+
     const wh = new Webhook(hookSecret);
     let msg;
     try {
+      console.log('Attempting webhook verification...');
       msg = wh.verify(payload, req.headers) as {
         type: string;
         data: {
@@ -39,9 +46,14 @@ serve(async (req) => {
           redirect_to: string;
         };
       };
+      console.log('Webhook verification successful');
     } catch (err) {
-      console.error(err);
-      return new Response(JSON.stringify(err), { status: 401 });
+      console.error('Webhook verification failed:', err);
+      console.error('Headers received:', Object.keys(req.headers));
+      return new Response(JSON.stringify({
+        error: 'Webhook verification failed',
+        details: err.message
+      }), { status: 401 });
     }
 
     const { type, data } = msg;
