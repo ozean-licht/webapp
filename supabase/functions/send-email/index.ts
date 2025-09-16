@@ -1,16 +1,31 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { Resend } from 'https://esm.sh/resend@4.0.0';
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0';
-import { render } from 'https://esm.sh/@react-email/render@0.0.17';
-import MagicLink from '../_templates/magic-link.tsx';
+import { Resend } from 'resend';
+import { Webhook } from 'standardwebhooks';
+import { render } from '@react-email/render';
+import { MagicLinkEmail } from '../_templates/magic-link.tsx';
 
-const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+const resendApiKey = Deno.env.get('RESEND_API_KEY');
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET');
+
+if (!resendApiKey) {
+  console.error('RESEND_API_KEY environment variable is not set');
+}
+if (!hookSecret) {
+  console.error('SEND_EMAIL_HOOK_SECRET environment variable is not set');
+}
+
+const resend = new Resend(resendApiKey);
 
 serve(async (req) => {
   if (req.method === 'POST') {
+    // Validate required environment variables
+    if (!hookSecret) {
+      console.error('SEND_EMAIL_HOOK_SECRET is not configured');
+      return new Response('Server configuration error', { status: 500 });
+    }
+
     const payload = await req.text();
-    const wh = new Webhook(hookSecret!);
+    const wh = new Webhook(hookSecret);
     let msg;
     try {
       msg = wh.verify(payload, req.headers) as {
@@ -35,13 +50,24 @@ serve(async (req) => {
     const { email, action_type, token, token_hash, redirect_to } = data;
 
     if (action_type === 'magic_link') {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      if (!supabaseUrl) {
+        console.error('SUPABASE_URL environment variable is not set');
+        return new Response('Server configuration error', { status: 500 });
+      }
+
+      if (!resendApiKey) {
+        console.error('RESEND_API_KEY is not configured for sending emails');
+        return new Response('Email service not configured', { status: 500 });
+      }
+
       const { data: resendData, error } = await resend.emails.send({
         from: 'Ozean Licht <auto@updates.ozean-licht.com>',
         to: [email],
         subject: 'Dein Magic Link für den Login',
         html: render(
-          MagicLink({
-            supabase_url: Deno.env.get('SUPABASE_URL')!,
+          MagicLinkEmail({
+            supabase_url: supabaseUrl,
             email_action_type: action_type,
             redirect_to,
             token_hash,
@@ -54,7 +80,9 @@ serve(async (req) => {
         console.error(error);
         return new Response(JSON.stringify(error), { status: 500 });
       }
-      console.log(resendData);
+      console.log('Email sent successfully:', resendData);
+    } else {
+      console.log('Ignoring non-magic-link action:', action_type);
     }
 
     return new Response('Email sent', { status: 200 });

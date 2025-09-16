@@ -21,16 +21,24 @@ export function MagicLinkForm() {
     setSuccess(false)
     setIsLoading(true)
 
-    // Simulate magic link sending process
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
       if (!email) {
         throw new Error("Bitte gib deine E-Mail-Adresse ein.")
       }
 
-      // Here you would typically make an API call to send the magic link
-      console.log("Magic link sent to:", email)
+      // Send magic link using Supabase Auth
+      const { data, error } = await fetch('/api/auth/magic-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      }).then(res => res.json())
+
+      if (error) {
+        throw new Error(error.message || "Fehler beim Senden des Magic Links")
+      }
+
       setSuccess(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
