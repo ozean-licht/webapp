@@ -26,9 +26,6 @@ export const metadata: Metadata = {
   title: "Ozean Licht",
   description: "Ozean Licht - Your Ocean of Light",
   generator: "v0.app",
-  icons: {
-    icon: "/favicon.ico",
-  },
 }
 
 export default function RootLayout({
