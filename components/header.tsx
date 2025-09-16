@@ -17,13 +17,9 @@ export function Header() {
         <div className="flex items-center justify-between px-3 py-2">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <Image
-              src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/LogoOzeanLichtKomprimiert.png"
-              alt="Ozean Licht Logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">OL</span>
+            </div>
             <h1 className="text-white text-xl tracking-wide font-cinzel">
               Ozean Licht<span className="text-sm align-super">™</span>
             </h1>
