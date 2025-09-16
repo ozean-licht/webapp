@@ -17,87 +17,50 @@ if (!hookSecret) {
 const resend = new Resend(resendApiKey);
 
 serve(async (req) => {
+  console.log('🚀 FUNCTION CALLED - Method:', req.method);
+
+  if (req.method === 'GET') {
+    return new Response(JSON.stringify({
+      message: 'Edge Function is working!',
+      timestamp: new Date().toISOString(),
+      version: '21',
+      hookSecretConfigured: !!hookSecret,
+      secrets: {
+        resendConfigured: !!resendApiKey,
+        hookSecretConfigured: !!hookSecret
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   if (req.method === 'POST') {
-    console.log('Received webhook request');
+    console.log('📨 POST request received');
 
-    // Validate required environment variables
-    if (!hookSecret) {
-      console.error('SEND_EMAIL_HOOK_SECRET is not configured');
-      return new Response('Server configuration error', { status: 500 });
-    }
-
-    console.log('Hook secret is configured, length:', hookSecret.length);
-
-    const payload = await req.text();
-    console.log('Payload received, length:', payload.length);
-
-    const wh = new Webhook(hookSecret);
-    let msg;
     try {
-      console.log('Attempting webhook verification...');
-      msg = wh.verify(payload, req.headers) as {
-        type: string;
-        data: {
-          type: string;
-          email: string;
-          action_type: string;
-          token: string;
-          token_hash: string;
-          redirect_to: string;
-        };
-      };
-      console.log('Webhook verification successful');
-    } catch (err) {
-      console.error('Webhook verification failed:', err);
-      console.error('Headers received:', Object.keys(req.headers));
+      const payload = await req.text();
+      console.log('📄 Payload length:', payload.length);
+      console.log('📋 Headers:', Object.keys(req.headers));
+
+      // For now, just acknowledge the request
       return new Response(JSON.stringify({
-        error: 'Webhook verification failed',
-        details: err.message
-      }), { status: 401 });
-    }
-
-    const { type, data } = msg;
-    if (type !== 'auth.send_email') return new Response('Ignored', { status: 200 });
-
-    const { email, action_type, token, token_hash, redirect_to } = data;
-
-    if (action_type === 'magic_link') {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL');
-      if (!supabaseUrl) {
-        console.error('SUPABASE_URL environment variable is not set');
-        return new Response('Server configuration error', { status: 500 });
-      }
-
-      if (!resendApiKey) {
-        console.error('RESEND_API_KEY is not configured for sending emails');
-        return new Response('Email service not configured', { status: 500 });
-      }
-
-      const { data: resendData, error } = await resend.emails.send({
-        from: 'Ozean Licht <auto@updates.ozean-licht.com>',
-        to: [email],
-        subject: 'Dein Magic Link für den Login',
-        html: render(
-          MagicLinkEmail({
-            supabase_url: supabaseUrl,
-            email_action_type: action_type,
-            redirect_to,
-            token_hash,
-            token,
-          })
-        ),
+        message: 'POST request processed',
+        timestamp: new Date().toISOString(),
+        version: '21',
+        payloadLength: payload.length,
+        headersCount: Object.keys(req.headers).length
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (error) {
-        console.error(error);
-        return new Response(JSON.stringify(error), { status: 500 });
-      }
-      console.log('Email sent successfully:', resendData);
-    } else {
-      console.log('Ignoring non-magic-link action:', action_type);
+    } catch (error) {
+      console.error('❌ Error processing POST:', error);
+      return new Response(JSON.stringify({
+        error: 'Processing failed',
+        details: error.message
+      }), { status: 500 });
     }
-
-    return new Response('Email sent', { status: 200 });
   }
 
   return new Response('Method not allowed', { status: 405 });
