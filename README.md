@@ -2,6 +2,8 @@
 
 A Next.js application built with TypeScript, Tailwind CSS, and ESLint.
 
+**Latest deployment fix applied**
+
 ## Getting Started
 
 First, install the dependencies:
