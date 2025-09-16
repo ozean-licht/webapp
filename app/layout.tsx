@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Cinzel_Decorative, Montserrat, Montserrat_Alternates } from "next/font/google"
 import { Suspense } from "react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 const cinzelDecorative = Cinzel_Decorative({
@@ -39,6 +40,7 @@ export default function RootLayout({
         className={`font-sans ${cinzelDecorative.variable} ${montserrat.variable} ${montserratAlternates.variable}`}
       >
         <Suspense fallback={null}>{children}</Suspense>
+        <SpeedInsights />
       </body>
     </html>
   )
