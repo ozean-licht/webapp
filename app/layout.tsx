@@ -1,22 +1,45 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type React from "react"
+import type { Metadata } from "next"
+import { Cinzel_Decorative, Montserrat, Montserrat_Alternates } from "next/font/google"
+import { Suspense } from "react"
+import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] });
+const cinzelDecorative = Cinzel_Decorative({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-cinzel-decorative",
+})
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  variable: "--font-montserrat",
+})
+
+const montserratAlternates = Montserrat_Alternates({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-montserrat-alternates",
+})
 
 export const metadata: Metadata = {
   title: "Ozean Licht",
-  description: "A Next.js application with TypeScript and Tailwind CSS",
-};
+  description: "Ozean Licht - Your Ocean of Light",
+  generator: "v0.app",
+}
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`font-sans ${cinzelDecorative.variable} ${montserrat.variable} ${montserratAlternates.variable}`}
+      >
+        <Suspense fallback={null}>{children}</Suspense>
+      </body>
     </html>
-  );
+  )
 }
