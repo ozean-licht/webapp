@@ -15,10 +15,14 @@ export async function POST(request: NextRequest) {
     const supabase = createSupabaseClient()
 
     // Send magic link using Supabase Auth
+    const redirectUrl = `https://testnet3.ozean-licht.com/auth/callback`
+
+    console.log('Using redirect URL:', redirectUrl)
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+        emailRedirectTo: redirectUrl,
       },
     })
 
