@@ -15,7 +15,7 @@ export function Footer() {
             />
           </div>
 
-          <p className="text-lg leading-relaxed max-w-3xl mx-auto font-light text-slate-300">
+          <p className="text-lg leading-relaxed max-w-3xl mx-auto font-light text-muted-foreground">
             Wir verankern kosmisches Wissen und Weisheit, unterstützen dich dabei dein volles Potenzial und deine
             Meisterschaft zu verkörpern. Lass uns deine Welt mit dem Licht deines Herzens erfüllen ♥
           </p>

@@ -18,7 +18,7 @@ import { CTA2 } from "@/components/cta-2"
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       <Header />
       <main className="space-y-20">
         <Hero />

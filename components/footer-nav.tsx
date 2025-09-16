@@ -6,13 +6,13 @@ export function FooterNav() {
         <div>
           <h3 className="text-[#F0F1F4] font-medium text-lg mb-4 font-montserrat-alternates">Veranstaltungen</h3>
           <nav className="space-y-3">
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light text-slate-300">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Kurse
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Events
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Community
             </a>
           </nav>
@@ -22,13 +22,13 @@ export function FooterNav() {
         <div>
           <h3 className="text-[#F0F1F4] font-medium text-lg mb-4 font-montserrat-alternates">Mission</h3>
           <nav className="space-y-3">
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Über Lia
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Magazin
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Bewerben
             </a>
           </nav>
@@ -38,13 +38,13 @@ export function FooterNav() {
         <div>
           <h3 className="text-[#F0F1F4] font-medium text-lg mb-4 font-montserrat-alternates">Support</h3>
           <nav className="space-y-3">
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Kontakt
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               FAQ
             </a>
-            <a href="#" className="block text-[#C4C8D4] hover:text-[#F0F1F4] transition-colors duration-200 font-light">
+            <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors duration-200 font-light">
               Hilfe
             </a>
           </nav>

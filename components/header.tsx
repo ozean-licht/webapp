@@ -1,16 +1,20 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { NavButton } from "./nav-button"
 import { PrimaryButton } from "./primary-button"
 
 export function Header() {
+  const pathname = usePathname()
   return (
-    <div className="pt-[30px] px-[6px]">
+    <div className="fixed top-0 left-0 right-0 z-50 pt-[30px] px-[6px]">
       <header
-        className="w-full max-w-[1000px] mx-auto rounded-full border backdrop-blur-[5px]"
+        className="w-full max-w-[1000px] mx-auto rounded-full border backdrop-blur-lg"
         style={{
-          backgroundColor: "#0A141F",
-          opacity: 0.8,
+          backgroundColor: "rgba(10, 20, 31, 0.6)",
           borderColor: "#0E282E",
         }}
       >
@@ -31,20 +35,30 @@ export function Header() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-0">
-            <NavButton active>Home</NavButton>
-            <NavButton>Über Lia</NavButton>
-            <NavButton>Kontakt</NavButton>
+            <Link href="/">
+              <NavButton active={pathname === "/"}>Home</NavButton>
+            </Link>
+            <Link href="/about-lia">
+              <NavButton active={pathname === "/about-lia"}>Über Lia</NavButton>
+            </Link>
+            <Link href="/contact">
+              <NavButton active={pathname === "/contact"}>Kontakt</NavButton>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-1">
-            <Button
-              className="text-white px-8 py-2 rounded-full font-medium font-montserrat hover:opacity-90 text-base bg-transparent border-none"
-              size="lg"
-            >
-              Registrieren
-            </Button>
+            <Link href="/register">
+              <Button
+                className="text-white px-8 py-2 rounded-full font-medium font-montserrat hover:opacity-90 text-base bg-transparent border-none"
+                size="lg"
+              >
+                Registrieren
+              </Button>
+            </Link>
 
-            <PrimaryButton>Anmelden</PrimaryButton>
+            <Link href="/login">
+              <PrimaryButton>Anmelden</PrimaryButton>
+            </Link>
           </div>
         </div>
       </header>

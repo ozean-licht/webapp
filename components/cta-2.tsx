@@ -6,12 +6,12 @@ import { InfoCard } from "./info-card"
 
 export function CTA2() {
   const peopleImages = [
-    "/people-1.png",
-    "/people-2.png",
-    "/people-3.png",
-    "/people-4.png",
-    "/people-5.png",
-    "/people-6.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_1.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_2.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_3.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_4.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_5.png",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/People%20Illustration/People_6.png",
   ]
 
   return (

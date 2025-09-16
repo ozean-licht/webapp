@@ -51,25 +51,20 @@ export function YouTubeTicker() {
     },
   ]
 
-  // Duplicate videos for seamless loop
-  const duplicatedVideos = [...videos, ...videos]
+  // Only render original videos once - the animation will create the continuous loop
 
   return (
     <section className="w-full py-16 overflow-hidden">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-cinzel text-white mb-4">Unsere YouTube Videos</h2>
-        <p className="text-white/70 font-montserrat-alt">Entdecke spirituelle Inhalte und Transformationsreisen</p>
-      </div>
-
       <div className="relative">
         <div
           ref={tickerRef}
-          className="flex gap-6 animate-scroll-left"
+          className="flex gap-6"
           style={{
-            animation: "scroll-left 30s linear infinite",
+            animation: "continuous-scroll 30s linear infinite",
           }}
         >
-          {duplicatedVideos.map((video, index) => (
+          {/* Render videos twice for seamless loop */}
+          {[...videos, ...videos].map((video, index) => (
             <div
               key={`${video.id}-${index}`}
               className="flex-shrink-0 w-80 bg-[#0A1A1A] rounded-lg overflow-hidden border border-[#0E282E] hover:border-primary/50 transition-colors cursor-pointer group"
@@ -106,16 +101,13 @@ export function YouTubeTicker() {
       </div>
 
       <style jsx>{`
-        @keyframes scroll-left {
+        @keyframes continuous-scroll {
           0% {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-100%);
           }
-        }
-        .animate-scroll-left {
-          animation: scroll-left 30s linear infinite;
         }
       `}</style>
     </section>

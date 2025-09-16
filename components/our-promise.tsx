@@ -10,7 +10,7 @@ export function OurPromise() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground text-balance">
             Mein Versprechen an dich
           </h2>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto text-pretty leading-relaxed text-slate-300 font-light">
+          <p className="text-lg md:text-xl max-w-3xl mx-auto text-pretty leading-relaxed text-muted-foreground font-light">
             Wir begleiten dich auf deinem Weg zu mehr Selbstvertrauen und innerer Stärke. Mit individuellen
             Coaching-Ansätzen und einer unterstützenden Community findest du zu deiner wahren Kraft und lebst das Leben,
             das du dir wirklich wünschst.

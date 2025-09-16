@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #00070f;
+  --background: #000F0F;
   --foreground: #ffffff;
   --card: #000d1a;
   --card-foreground: #ffffff;
@@ -45,7 +45,7 @@
 }
 
 .dark {
-  --background: #00070f;
+  --background: #000F0F;
   --foreground: #ffffff;
   --card: #000d1a;
   --card-foreground: #ffffff;
@@ -136,13 +136,19 @@
     @apply bg-background text-foreground;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* Adding global typography hierarchy */
   h1 {
     font-family: var(--font-cinzel-decorative);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.60);
   }
 
   h2 {
     font-family: var(--font-cinzel-decorative);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.42);
   }
 
   h3 {
@@ -211,4 +217,14 @@
 
 .animate-scroll-left {
   animation: scroll-left 20s linear infinite;
+}
+
+/* Spin animation for rotating elements */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

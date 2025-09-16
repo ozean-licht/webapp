@@ -17,7 +17,7 @@ const blogPosts: BlogPost[] = [
     category: "Update / Announcement",
     date: "04.04.2025",
     readTime: "4 min",
-    image: "/mobile-app-development-cosmic-theme.jpg",
+    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Kids-ascension-update.webp",
   },
   {
     id: "2",
@@ -25,7 +25,7 @@ const blogPosts: BlogPost[] = [
     category: "Community Love Letter",
     date: "18.03.2025",
     readTime: "4 min",
-    image: "/maine-coon-cat-sitting-by-window.jpg",
+    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Maine%20Coons.png",
   },
   {
     id: "3",
@@ -33,7 +33,7 @@ const blogPosts: BlogPost[] = [
     category: "Community Love Letter",
     date: "18.03.2025",
     readTime: "3 min",
-    image: "/cosmic-heart-healing-energy-golden-light.jpg",
+    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Herz%20Heilung.png",
   },
   {
     id: "4",
@@ -41,7 +41,7 @@ const blogPosts: BlogPost[] = [
     category: "Community Love Letter",
     date: "18.03.2025",
     readTime: "5 min",
-    image: "/purple-cosmic-heart-energy-miracle.jpg",
+    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Ein%20Wunder%20ist%20Geschehen.png",
   },
   {
     id: "5",
@@ -49,7 +49,7 @@ const blogPosts: BlogPost[] = [
     category: "Community Love Letter",
     date: "18.03.2025",
     readTime: "8 min",
-    image: "/vintage-scientific-equipment-lakhovsky-device.jpg",
+    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Lakovsky.png",
   },
 ]
 

@@ -12,7 +12,7 @@ export function Hero() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-foreground text-balance">
             Dein persönlicher Lichtblick, komm in deine Kraft
           </h1>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto text-pretty text-slate-300 font-light">
+          <p className="text-lg md:text-xl max-w-3xl mx-auto text-pretty text-muted-foreground font-light">
             Du bist wertvoll ❤ Ich helfe dir, endlich glücklich zu sein und das Leben zu leben, das du dir wünschst.
             LEBE dich und dein volles Potenzial!
           </p>
