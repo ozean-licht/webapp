@@ -1,6 +1,5 @@
 'use client'
 
-import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 
 export default function TestSupabase() {
@@ -8,9 +7,11 @@ export default function TestSupabase() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    // Test der Supabase-Verbindung
+    // Dynamischer Import um Build-Fehler zu vermeiden
     const testConnection = async () => {
       try {
+        const { supabase } = await import('@/lib/supabase')
+
         // Einfache Abfrage um die Verbindung zu testen
         const { data, error } = await supabase.auth.getUser()
 
