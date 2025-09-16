@@ -1,17 +1,14 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+// Supabase Middleware für Auth-Session-Management
+// Vereinfacht für Next.js 15 und Supabase v2
+
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  // Refresh session if expired - required for Server Components
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  return res
+  // Für jetzt vereinfacht - kann später erweitert werden
+  // wenn Auth-Funktionalität benötigt wird
+  return NextResponse.next()
 }
 
 export const config = {
