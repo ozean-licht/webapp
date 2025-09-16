@@ -40,7 +40,7 @@ export default function RootLayout({
         className={`font-sans ${cinzelDecorative.variable} ${montserrat.variable} ${montserratAlternates.variable}`}
       >
         <Suspense fallback={null}>{children}</Suspense>
-        {/* Speed Insights wird automatisch von Vercel geladen */}
+        <SpeedInsights />
       </body>
     </html>
   )
