@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   title: "Ozean Licht",
   description: "Ozean Licht - Your Ocean of Light",
   generator: "v0.app",
+  icons: {
+    icon: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/FaviconOzeanLicht.png",
+  },
 }
 
 export default function RootLayout({
