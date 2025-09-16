@@ -10,9 +10,9 @@ import {
   Preview,
   Section,
   Text,
-} from '@react-email/components';
+} from 'https://esm.sh/@react-email/components@0.0.15';
 
-import { render } from '@react-email/render';
+import { render } from 'https://esm.sh/@react-email/render@0.0.17';
 
 interface MagicLinkEmailProps {
   supabase_url: string;

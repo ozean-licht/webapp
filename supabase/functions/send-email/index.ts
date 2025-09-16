@@ -1,8 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { Resend } from 'https://esm.sh/resend@4.0.0';
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0';
-import { renderAsync } from 'https://esm.sh/@react-email/render@0.0.17';
-import MagicLink from './_templates/magic-link.tsx';
+import { render } from 'https://esm.sh/@react-email/render@0.0.17';
+import MagicLink from '../_templates/magic-link.tsx';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET');
@@ -39,7 +39,7 @@ serve(async (req) => {
         from: 'Ozean Licht <auto@updates.ozean-licht.com>',
         to: [email],
         subject: 'Dein Magic Link für den Login',
-        html: await renderAsync(
+        html: render(
           MagicLink({
             supabase_url: Deno.env.get('SUPABASE_URL')!,
             email_action_type: action_type,
