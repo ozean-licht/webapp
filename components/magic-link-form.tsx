@@ -10,12 +10,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail } from "lucide-react"
 
 export function MagicLinkForm() {
+  console.log('🔥 MagicLinkForm component rendered!')
+
   const [email, setEmail] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('🎯 Magic Link Form submitted!')
+    console.log('📧 Email:', email)
+
     e.preventDefault()
     setError("")
     setSuccess(false)
@@ -23,24 +28,39 @@ export function MagicLinkForm() {
 
     try {
       if (!email) {
+        console.log('❌ No email provided')
         throw new Error("Bitte gib deine E-Mail-Adresse ein.")
       }
 
-      // Send magic link using Supabase Auth
-      const { data, error } = await fetch('/api/auth/magic-link', {
+      console.log('📡 Making API call to /api/auth/magic-link...')
+
+      const response = await fetch('/api/auth/magic-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
-      }).then(res => res.json())
+      })
 
-      if (error) {
-        throw new Error(error.message || "Fehler beim Senden des Magic Links")
+      console.log('📨 Response status:', response.status)
+      console.log('📨 Response headers:', Object.fromEntries(response.headers.entries()))
+
+      const result = await response.json()
+      console.log('📨 Response data:', result)
+
+      if (!response.ok) {
+        throw new Error(result.error || `HTTP ${response.status}`)
       }
 
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      console.log('✅ Magic link sent successfully!')
       setSuccess(true)
+
     } catch (err) {
+      console.error('💥 Error in handleSubmit:', err)
       setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
     } finally {
       setIsLoading(false)
