@@ -42,32 +42,48 @@ serve(async (req) => {
       try {
         const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://suwevnhwtmcazjugfmps.supabase.co';
 
-        // Import the email template
+        // Import the email template with logo and Cinzel Decorative
         const emailHtml = `
           <!DOCTYPE html>
           <html>
             <head>
               <meta charset="utf-8">
               <title>Dein Magic Link</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
             </head>
-            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #0a141f 0%, #1a2332 100%); color: white; padding: 40px; border-radius: 10px; text-align: center;">
-                <h1 style="margin: 0; font-size: 28px;">Willkommen zurück!</h1>
-                <p style="font-size: 16px; margin: 20px 0;">
+            <body style="font-family: 'Montserrat', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a141f;">
+              <div style="background: linear-gradient(135deg, #0a141f 0%, #1a2332 100%); color: white; padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <div style="margin-bottom: 30px;">
+                  <img src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Akadmie%20Komprimiert.png"
+                       alt="Ozean Licht Logo"
+                       style="width: 80px; height: auto; filter: brightness(0) invert(1);">
+                </div>
+                <h1 style="margin: 0; font-size: 32px; font-family: 'Cinzel Decorative', serif; font-weight: 700; text-shadow: 0 0 20px rgba(255,255,255,0.3); letter-spacing: 2px;">Willkommen zurück!</h1>
+                <p style="font-size: 16px; margin: 20px 0; line-height: 1.6; opacity: 0.9;">
                   Du hast dich für einen sicheren Login bei Ozean Licht entschieden.
+                  Klicke einfach auf den Button unten, um dich automatisch anzumelden.
                 </p>
-                <div style="margin: 30px 0;">
+                <div style="margin: 40px 0;">
                   <a href="${supabaseUrl}/auth/v1/verify?token=demo&email=${encodeURIComponent(data.email)}&type=magiclink&redirect_to=${encodeURIComponent(data.redirectTo || `${supabaseUrl}/auth/callback`)}"
-                     style="background: #188689; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                     style="background: linear-gradient(135deg, #188689 0%, #20a8a3 100%); color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px rgba(24, 134, 137, 0.4); transition: all 0.3s ease;">
                     🔐 Mit Magic Link anmelden
                   </a>
                 </div>
-                <p style="font-size: 14px; margin: 20px 0;">
-                  Dieser Link ist 1 Stunde gültig.
+                <p style="font-size: 14px; margin: 20px 0; opacity: 0.8;">
+                  Dieser Link ist 1 Stunde gültig und kann nur einmal verwendet werden.
                 </p>
               </div>
-              <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-                <p>© 2025 Ozean Licht™ - Alle Rechte vorbehalten</p>
+              <div style="text-align: center; margin-top: 30px; color: #888; font-size: 12px; font-family: 'Montserrat', sans-serif;">
+                <hr style="border: none; border-top: 1px solid #333; margin: 20px 0;">
+                <p style="margin: 10px 0;">
+                  Bei Fragen kontaktiere uns gerne unter
+                  <a href="mailto:hello@ozean-licht.com" style="color: #188689; text-decoration: none; font-weight: 500;">hello@ozean-licht.com</a>
+                </p>
+                <p style="margin: 10px 0; font-weight: 300;">
+                  © 2025 Ozean Licht™ - Alle Rechte vorbehalten
+                </p>
               </div>
             </body>
           </html>
