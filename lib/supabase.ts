@@ -74,7 +74,7 @@ export async function getCoursesFromAirtable(limit: number = 50) {
 // Query-Data Edge Function - Zentralisierte Datenabfragen
 async function queryData(endpoint: string, params: Record<string, any> = {}) {
   try {
-    const functionUrl = `${SUPABASE_PROJECT_URL}/functions/v1/query-data`;
+    const functionUrl = `${SUPABASE_PROJECT_URL}/functions/v1/query-data` || `https://suwevnhwtmcazjugfmps.supabase.co/functions/v1/query-data`;
 
     console.log(`🚀 Calling Query-Data Edge Function: ${endpoint}`, params);
 
@@ -117,7 +117,7 @@ export function createFallbackImageUrl(title: string) {
 }
 
 // Edge Function Helper Functions
-const SUPABASE_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || supabaseUrl
 
 export async function getCoursesFromEdge(limit: number = 50): Promise<any[]> {
   try {
@@ -202,6 +202,44 @@ async function getCourseDirect(slug: string): Promise<any | null> {
   } catch (error) {
     console.error('💥 Direct query failed:', error)
     return null
+  }
+}
+
+// Eigene Query-Funktion für mehrere Kurse mit zuverlässigen Bildern
+export async function getCoursesWithReliableImages(limit: number = 50) {
+  try {
+    console.log('🚀 Calling Query-Data Edge Function for courses with reliable images...');
+    const courses = await queryData('courses', {
+      limit,
+      published_only: true
+    });
+
+    // Verarbeite die Bilder für zuverlässiges Loading
+    return courses.map(course => ({
+      ...course,
+      // Stelle sicher, dass die URLs korrekt sind
+      thumbnail_url_desktop: course.thumbnail_url_desktop || null,
+      thumbnail_url_mobile: course.thumbnail_url_mobile || null,
+      // Füge eine zuverlässige Image-URL hinzu
+      reliable_image_url: course.thumbnail_url_desktop ||
+                         course.thumbnail_url_mobile ||
+                         createFallbackImageUrl(course.title)
+    }));
+
+  } catch (error) {
+    console.error('💥 Error calling Query-Data Edge Function:', error);
+    // Fallback to direct Supabase query
+    console.log('🔄 Falling back to direct Supabase query...');
+    return getCoursesDirect(limit).then(courses =>
+      courses.map(course => ({
+        ...course,
+        thumbnail_url_desktop: course.thumbnail_url_desktop || null,
+        thumbnail_url_mobile: course.thumbnail_url_mobile || null,
+        reliable_image_url: course.thumbnail_url_desktop ||
+                           course.thumbnail_url_mobile ||
+                           createFallbackImageUrl(course.title)
+      }))
+    );
   }
 }
 
