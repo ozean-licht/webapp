@@ -111,6 +111,60 @@ RESEND_API_KEY=your_resend_api_key
 SEND_EMAIL_HOOK_SECRET=your_webhook_secret
 ```
 
+## Course Import & Thumbnail Processing
+
+### Scripts Overview
+
+```bash
+# Start development server
+npm run dev
+
+# Sync courses from Airtable (LOW LOAD VERSION - 2 per batch, 3s delay)
+node sync-airtable-courses.js sync
+
+# Sync only first 5 courses for testing
+node sync-airtable-courses.js sync 5
+
+# Preview courses from Airtable
+node sync-airtable-courses.js preview
+
+# Fix missing thumbnails (for courses without thumbnails)
+node fix-missing-thumbnails.js
+
+# Test thumbnail processing
+node test-thumbnail-fix.js
+```
+
+### Thumbnail Processing Problem & Solution
+
+#### Problem: Nur die ersten 3 Bilder wurden verarbeitet
+
+**Ursache:** Die Edge Function war zu komplex und überlastet bei gleichzeitiger Verarbeitung mehrerer Kurse.
+
+**Symptome:**
+- ✅ Erste 3 Kurse: Bilder laden erfolgreich
+- ❌ Restliche Kurse: Zeigen Fallback-Design
+- ❌ Edge Function überlastet bei Batch-Processing
+
+#### Lösung implementiert:
+
+1. **Vereinfachte Edge Function** - Entfernt komplexe Kompressionsalgorithmen
+2. **Reduzierte Batch-Größe** - Nur 2 Kurse gleichzeitig statt 5
+3. **Längere Delays** - 3 Sekunden zwischen Batches statt 2
+4. **Robuste Fehlerbehandlung** - Fortsetzung bei einzelnen Fehlern
+
+### Thumbnail-Fix durchführen:
+
+```bash
+# 1. Teste die neue Edge Function
+node test-thumbnail-fix.js
+
+# 2. Repariere fehlende Thumbnails
+node fix-missing-thumbnails.js
+
+# 3. Überprüfe das Ergebnis auf localhost:3001/courses
+```
+
 ## Technologies Used
 
 - Next.js 15 (App Router)

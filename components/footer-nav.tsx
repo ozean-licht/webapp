@@ -1,6 +1,6 @@
 export function FooterNav() {
   return (
-    <div className="bg-[#00111A]/50 backdrop-blur-sm border border-[#0E282E] rounded-2xl p-8">
+    <div className="bg-[#001212]/60 backdrop-blur-sm border border-[#0E282E] rounded-2xl p-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         {/* Veranstaltungen Column */}
         <div>

@@ -1,6 +1,6 @@
 
 [functions.send-email]
-enabled = true
+enabled = false
 verify_jwt = false
 import_map = "./functions/send-email/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
@@ -9,3 +9,15 @@ entrypoint = "./functions/send-email/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/send-email/*.html" ]
+
+[functions.query-data]
+enabled = true
+verify_jwt = false
+import_map = "./functions/query-data/deno.json"
+entrypoint = "./functions/query-data/index.ts"
+
+[functions.process-course-thumbnail]
+enabled = true
+verify_jwt = false
+import_map = "./functions/process-course-thumbnail/deno.json"
+entrypoint = "./functions/process-course-thumbnail/index.ts"

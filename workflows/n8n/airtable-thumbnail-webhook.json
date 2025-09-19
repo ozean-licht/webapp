@@ -1,0 +1,705 @@
+{
+  "name": "Airtable Thumbnail Change Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "airtable-thumbnail-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "boolean": [
+            {
+              "name": "hasThumbnailChange",
+              "value": "={{ $json.changedFields && $json.changedFields.includes('thumbnail') }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "recordId",
+              "value": "={{ $json.recordId }}"
+            },
+            {
+              "name": "baseId",
+              "value": "={{ $json.baseId }}"
+            },
+            {
+              "name": "tableId",
+              "value": "={{ $json.tableId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Extract Webhook Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.hasThumbnailChange }}",
+              "operation": "true"
+            }
+          ]
+        },
+        "combineOperation": "any",
+        "options": {}
+      },
+      "name": "Check Thumbnail Changed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "application": "airtable",
+        "operation": "get",
+        "baseId": "={{ $json.baseId }}",
+        "table": "courses",
+        "recordId": "={{ $json.recordId }}",
+        "options": {
+          "fields": [
+            "title",
+            "slug",
+            "thumbnail"
+          ]
+        }
+      },
+      "name": "Get Updated Course",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        900,
+        160
+      ],
+      "credentials": {
+        "airtableApi": {
+          "id": "airtable-api-key",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/courses?slug=eq.{{ $json.fields.slug }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Get Existing Course",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $response.statusCode }}",
+              "value2": 200,
+              "operation": "equal"
+            },
+            {
+              "value1": "={{ $response.body.length }}",
+              "value2": 0,
+              "operation": "greaterThan"
+            }
+          ]
+        },
+        "combineOperation": "all",
+        "options": {}
+      },
+      "name": "Course Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "oldThumbnailDesktop",
+              "value": "={{ $response.body[0].thumbnail_url_desktop }}"
+            },
+            {
+              "name": "oldThumbnailMobile",
+              "value": "={{ $response.body[0].thumbnail_url_mobile }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Store Old Thumbnails",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1560,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "oldThumbnailDesktop",
+              "value": "null"
+            },
+            {
+              "name": "oldThumbnailMobile",
+              "value": "null"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "No Old Thumbnails",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1560,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract file paths from old thumbnail URLs\n\nlet filesToDelete = [];\n\nif ($input.item.json.oldThumbnailDesktop) {\n  const desktopUrl = $input.item.json.oldThumbnailDesktop;\n  const pathMatch = desktopUrl.match(/course_thumbs\\/(.+)$/);\n  if (pathMatch) {\n    filesToDelete.push(pathMatch[1]);\n  }\n}\n\nif ($input.item.json.oldThumbnailMobile) {\n  const mobileUrl = $input.item.json.oldThumbnailMobile;\n  const pathMatch = mobileUrl.match(/course_thumbs\\/(.+)$/);\n  if (pathMatch) {\n    filesToDelete.push(pathMatch[1]);\n  }\n}\n\nreturn {\n  json: {\n    ...$input.item.json,\n    filesToDelete\n  }\n};"
+      },
+      "name": "Extract File Paths",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $env.SUPABASE_URL }}/storage/v1/object/course_thumbs/{{ $json.filesToDelete[0] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Delete Old Desktop",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $env.SUPABASE_URL }}/storage/v1/object/course_thumbs/{{ $json.filesToDelete[1] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Delete Old Mobile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/process-course-thumbnail",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "course_slug",
+              "value": "={{ $json.fields.slug }}"
+            },
+            {
+              "name": "png_url",
+              "value": "={{ $json.fields.thumbnail[0].url }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process New Thumbnail",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2440,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/courses?slug=eq.{{ $json.fields.slug }}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "thumbnail_url_desktop",
+              "value": "={{ $response.body.thumbnails.desktop_webp }}"
+            },
+            {
+              "name": "thumbnail_url_mobile",
+              "value": "={{ $response.body.thumbnails.mobile_webp }}"
+            },
+            {
+              "name": "updated_at",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Update Course URLs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2220,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "webhookResponse",
+              "value": "Thumbnail updated successfully for course: {{ $json.fields.slug }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        2440,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.webhookResponse }}",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "No thumbnail change detected",
+        "responseCode": 200,
+        "options": {}
+      },
+      "name": "No Change Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        680,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@ozean-licht.com",
+        "toEmail": "sergej@ozean-licht.com",
+        "subject": "🚨 ALERT: Thumbnail Processing Failed",
+        "text": "=Alert Details:\n\nWorkflow: Airtable Thumbnail Sync\nTimestamp: {{ $now }}\n\nError Details:\n{{ $json.error.message || 'Unknown error' }}\n\nCourse: {{ $json.fields.slug || 'Unknown' }}\nBase ID: {{ $json.baseId }}\nRecord ID: {{ $json.recordId }}\n\nPlease check the workflow logs immediately.\n\n-- Ozean-Licht System Alert --",
+        "options": {}
+      },
+      "name": "Send Failure Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        400
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "email-smtp",
+          "name": "Email SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "error.message",
+              "value": "={{ $json.error || 'Thumbnail processing failed' }}"
+            },
+            {
+              "name": "error.timestamp",
+              "value": "={{ $now }}"
+            },
+            {
+              "name": "error.workflow",
+              "value": "Airtable Thumbnail Sync"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Prepare Error Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        2000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Error processing thumbnail - alert sent",
+        "responseCode": 500,
+        "options": {}
+      },
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Webhook Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Webhook Data": {
+      "main": [
+        [
+          {
+            "node": "Check Thumbnail Changed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Thumbnail Changed": {
+      "main": [
+        [
+          {
+            "node": "Get Updated Course",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Change Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Updated Course": {
+      "main": [
+        [
+          {
+            "node": "Get Existing Course",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Course": {
+      "main": [
+        [
+          {
+            "node": "Course Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Course Exists": {
+      "main": [
+        [
+          {
+            "node": "Store Old Thumbnails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Old Thumbnails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Old Thumbnails": {
+      "main": [
+        [
+          {
+            "node": "Extract File Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Old Thumbnails": {
+      "main": [
+        [
+          {
+            "node": "Extract File Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract File Paths": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Desktop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Old Mobile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process New Thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Desktop": {
+      "main": [
+        [
+          {
+            "node": "Process New Thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Mobile": {
+      "main": [
+        [
+          {
+            "node": "Process New Thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process New Thumbnail": {
+      "main": [
+        [
+          {
+            "node": "Update Course URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Prepare Error Data",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Course URLs": {
+      "error": [
+        [
+          {
+            "node": "Prepare Error Data",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Error Data": {
+      "main": [
+        [
+          {
+            "node": "Send Failure Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Failure Email": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/Berlin",
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null
+}

@@ -47,7 +47,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full shadow-lg" style={{ backgroundColor: "#00111A", borderColor: "#0E282E" }}>
+    <Card className="w-full shadow-lg bg-[#001212]/60 border-[#0E282E]">
       <CardHeader className="space-y-4 text-center">
         <div className="flex justify-center">
           <img

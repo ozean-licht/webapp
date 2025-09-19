@@ -1,5 +1,4 @@
-import type React from "react"
-import { Star, Heart, Lightbulb, MagicWand, Moon, ChatCircle, Users, Sparkle } from "@phosphor-icons/react"
+import { Star, Heart, Lightbulb, Wand2, Moon, MessageCircle, Users, Sparkle } from "lucide-react"
 
 interface SpanBadgeProps {
   icon?: string
@@ -16,11 +15,11 @@ export default function SpanBadge({ icon, text, children, variant = "default" }:
       case "lightbulb":
         return <Lightbulb size={16} className="text-white" />
       case "magicwand":
-        return <MagicWand size={16} className="text-white" />
+        return <Wand2 size={16} className="text-white" />
       case "moon":
         return <Moon size={16} className="text-white" />
       case "feedback":
-        return <ChatCircle size={16} className="text-white" />
+        return <MessageCircle size={16} className="text-white" />
       case "users":
         return <Users size={16} className="text-white" />
       case "sparkle":

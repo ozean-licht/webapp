@@ -39,11 +39,16 @@ export function InfoCard({ heading, paragraph, icon }: InfoCardProps) {
           />
 
           <div className="absolute bottom-[19px] left-1/2 transform -translate-x-1/2 z-20">
-            {icon || (
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            )}
+            <div className="relative animate-pulse">
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse"></div>
+              <div className="relative z-10">
+                {icon || (
+                  <svg className="w-6 h-6 text-primary drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="relative z-10">
@@ -52,7 +57,7 @@ export function InfoCard({ heading, paragraph, icon }: InfoCardProps) {
               style={{
                 width: "46px",
                 height: "46px",
-                animation: "spin 3s linear infinite",
+                animation: "spin 3s linear infinite, pulse 2s ease-in-out infinite alternate",
               }}
             >
               <img
@@ -108,11 +113,16 @@ export function InfoCardWithButton({ heading, paragraph, icon, buttonText, butto
           />
 
           <div className="absolute bottom-[19px] left-1/2 transform -translate-x-1/2 z-20">
-            {icon || (
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            )}
+            <div className="relative animate-pulse">
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse"></div>
+              <div className="relative z-10">
+                {icon || (
+                  <svg className="w-6 h-6 text-primary drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="relative z-10">
@@ -121,7 +131,7 @@ export function InfoCardWithButton({ heading, paragraph, icon, buttonText, butto
               style={{
                 width: "46px",
                 height: "46px",
-                animation: "spin 3s linear infinite",
+                animation: "spin 3s linear infinite, pulse 2s ease-in-out infinite alternate",
               }}
             >
               <img
