@@ -71,39 +71,7 @@ export async function getCoursesFromAirtable(limit: number = 50) {
   }
 }
 
-// Query-Data Edge Function - Zentralisierte Datenabfragen
-async function queryData(endpoint: string, params: Record<string, any> = {}) {
-  try {
-    const functionUrl = `${SUPABASE_PROJECT_URL}/functions/v1/query-data` || `https://suwevnhwtmcazjugfmps.supabase.co/functions/v1/query-data`;
-
-    console.log(`🚀 Calling Query-Data Edge Function: ${endpoint}`, params);
-
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      },
-      body: JSON.stringify({
-        endpoint,
-        params
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Query-Data Edge Function error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log(`✅ Query-Data returned ${Array.isArray(data) ? data.length : 'single'} ${endpoint}`);
-
-    return data;
-  } catch (error) {
-    console.error(`❌ Query-Data Edge Function call failed for ${endpoint}:`, error);
-    throw error;
-  }
-}
+// Direkte Supabase-Abfragen - Keine Edge Functions mehr nötig
 
 // Erstelle eine zuverlässige Fallback-Image-URL
 export function createFallbackImageUrl(title: string) {
@@ -117,22 +85,18 @@ export function createFallbackImageUrl(title: string) {
 }
 
 // Edge Function Helper Functions
-const SUPABASE_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || supabaseUrl
 
 export async function getCoursesFromEdge(limit: number = 50): Promise<any[]> {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for courses...');
-    const courses = await queryData('courses', {
-      limit,
-      published_only: true
-    });
+    console.log('🚀 Loading courses directly from Supabase...');
+    const courses = await getCoursesDirect(limit);
 
-    console.log(`✅ Query-Data returned ${courses.length} courses`);
+    console.log(`✅ Loaded ${courses.length} courses`);
 
     // Debug problematic courses
     courses.forEach(course => {
       if (course.title.includes('Q&A') || course.title.includes('Energie Update') || course.title.includes('Partner & Friends')) {
-        console.log(`🔧 Edge Course: ${course.title.substring(0, 50)}...`);
+        console.log(`🔧 Course: ${course.title.substring(0, 50)}...`);
         console.log(`   Desktop: ${course.thumbnail_url_desktop ? '✅' : '❌'}`);
         console.log(`   Mobile:  ${course.thumbnail_url_mobile ? '✅' : '❌'}`);
       }
@@ -140,25 +104,21 @@ export async function getCoursesFromEdge(limit: number = 50): Promise<any[]> {
 
     return courses;
   } catch (error) {
-    console.error('❌ Query-Data Edge Function call failed:', error);
-    // Fallback to direct Supabase query
-    console.log('🔄 Falling back to direct Supabase query...');
-    return getCoursesDirect(limit);
+    console.error('❌ Direct query failed:', error);
+    return [];
   }
 }
 
 export async function getCourseFromEdge(slug: string): Promise<any | null> {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for single course...');
-    const course = await queryData('course', { slug });
+    console.log('🚀 Loading single course from Supabase...');
+    const course = await getCourseDirect(slug);
 
-    console.log(`✅ Query-Data returned course: ${course.title}`);
+    console.log(`✅ Loaded course: ${course?.title || 'Not found'}`);
     return course;
   } catch (error) {
-    console.error('❌ Query-Data Edge Function call failed:', error);
-    // Fallback to direct Supabase query
-    console.log('🔄 Falling back to direct Supabase query...');
-    return getCourseDirect(slug);
+    console.error('❌ Direct query failed:', error);
+    return null;
   }
 }
 
@@ -208,11 +168,8 @@ async function getCourseDirect(slug: string): Promise<any | null> {
 // Eigene Query-Funktion für mehrere Kurse mit zuverlässigen Bildern
 export async function getCoursesWithReliableImages(limit: number = 50) {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for courses with reliable images...');
-    const courses = await queryData('courses', {
-      limit,
-      published_only: true
-    });
+    console.log('🚀 Loading courses with reliable images directly from Supabase...');
+    const courses = await getCoursesDirect(limit);
 
     // Verarbeite die Bilder für zuverlässiges Loading
     return courses.map(course => ({
@@ -227,27 +184,16 @@ export async function getCoursesWithReliableImages(limit: number = 50) {
     }));
 
   } catch (error) {
-    console.error('💥 Error calling Query-Data Edge Function:', error);
-    // Fallback to direct Supabase query
-    console.log('🔄 Falling back to direct Supabase query...');
-    return getCoursesDirect(limit).then(courses =>
-      courses.map(course => ({
-        ...course,
-        thumbnail_url_desktop: course.thumbnail_url_desktop || null,
-        thumbnail_url_mobile: course.thumbnail_url_mobile || null,
-        reliable_image_url: course.thumbnail_url_desktop ||
-                           course.thumbnail_url_mobile ||
-                           createFallbackImageUrl(course.title)
-      }))
-    );
+    console.error('💥 Error loading courses:', error);
+    return [];
   }
 }
 
 // Eigene Query-Funktion für einen einzelnen Kurs
 export async function getCourseWithReliableImages(slug: string) {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for single course...');
-    const course = await queryData('course', { slug });
+    console.log('🚀 Loading single course with reliable images from Supabase...');
+    const course = await getCourseDirect(slug);
 
     if (!course) return null;
 
@@ -264,38 +210,33 @@ export async function getCourseWithReliableImages(slug: string) {
     };
 
   } catch (error) {
-    console.error('💥 Error calling Query-Data Edge Function:', error);
+    console.error('💥 Error loading course:', error);
     return null;
   }
 }
 
-// Profile Query Functions (über Query-Data Edge Function)
+// Profile Query Functions (direkte Supabase-Abfragen)
 export async function getProfilesFromEdge(limit: number = 50): Promise<any[]> {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for profiles...');
-    const profiles = await queryData('profiles', { limit });
-    console.log(`✅ Query-Data returned ${profiles.length} profiles`);
+    console.log('🚀 Loading profiles from Supabase...');
+    const profiles = await getProfilesDirect(limit);
+    console.log(`✅ Loaded ${profiles.length} profiles`);
     return profiles;
   } catch (error) {
-    console.error('❌ Query-Data Edge Function call failed:', error);
-    console.log('🔄 Falling back to direct Supabase query...');
-    return getProfilesDirect(limit);
+    console.error('❌ Direct query failed:', error);
+    return [];
   }
 }
 
 export async function getProfileFromEdge(id?: string, userId?: string): Promise<any | null> {
   try {
-    console.log('🚀 Calling Query-Data Edge Function for single profile...');
-    const profile = await queryData('profile', {
-      id,
-      user_id: userId
-    });
-    console.log(`✅ Query-Data returned profile: ${profile.vorname} ${profile.nachname}`);
+    console.log('🚀 Loading single profile from Supabase...');
+    const profile = await getProfileDirect(id, userId);
+    console.log(`✅ Loaded profile: ${profile?.vorname} ${profile?.nachname}`);
     return profile;
   } catch (error) {
-    console.error('❌ Query-Data Edge Function call failed:', error);
-    console.log('🔄 Falling back to direct Supabase query...');
-    return getProfileDirect(id, userId);
+    console.error('❌ Direct query failed:', error);
+    return null;
   }
 }
 
