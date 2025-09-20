@@ -335,8 +335,12 @@
               "value": "={{ $json.slug }}"
             },
             {
-              "name": "png_url",
+              "name": "image_url",
               "value": "={{ $json.png_url }}"
+            },
+            {
+              "name": "action",
+              "value": "process_4_variants"
             }
           ]
         },
@@ -376,8 +380,12 @@
               "value": "={{ $json.slug }}"
             },
             {
-              "name": "png_url",
+              "name": "image_url",
               "value": "={{ $json.png_url }}"
+            },
+            {
+              "name": "action",
+              "value": "process_4_variants"
             }
           ]
         },

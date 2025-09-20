@@ -19,23 +19,14 @@ interface Course {
 
 async function getFeaturedCourses(): Promise<Course[]> {
   try {
-    // Versuche zuerst Airtable für direkte Bild-URLs
-    console.log('🚀 CoursePreview attempting Airtable...')
-    const courses = await getCoursesFromAirtable(5)
-    console.log(`✅ CoursePreview received ${courses.length} courses from Airtable`)
+    // Lade Featured Kurse direkt aus Supabase (kein Airtable Fallback)
+    console.log('🚀 CoursePreview loading from Supabase...')
+    const courses = await getCoursesFromEdge(5)
+    console.log(`✅ CoursePreview received ${courses.length} courses from Supabase`)
     return courses
-  } catch (airtableError) {
-    console.warn('⚠️ Airtable failed for CoursePreview, using Edge Function:', airtableError.message)
-
-    try {
-      console.log('🚀 CoursePreview calling Edge Function...')
-      const courses = await getCoursesFromEdge(5)
-      console.log(`✅ CoursePreview received ${courses.length} courses from Edge Function`)
-      return courses
-    } catch (edgeError) {
-      console.error('💥 Both sources failed for CoursePreview:', edgeError)
-      return []
-    }
+  } catch (error) {
+    console.error('💥 Failed to load courses for CoursePreview:', error.message)
+    return []
   }
 }
 

@@ -20,24 +20,14 @@ interface Course {
 
 async function getCourses(): Promise<Course[]> {
   try {
-    // Versuche zuerst Airtable (direkte Bild-URLs, viel zuverlässiger)
-    console.log('🔍 Attempting to load courses from Airtable...')
-    const courses = await getCoursesFromAirtable(50)
-    console.log(`✅ Loaded ${courses.length} courses from Airtable`)
+    // Lade Kurse direkt aus Supabase (kein Airtable Fallback)
+    console.log('🚀 Loading courses from Supabase...')
+    const courses = await getCoursesFromEdge(50)
+    console.log(`✅ Loaded ${courses.length} courses from Supabase`)
     return courses
-  } catch (airtableError) {
-    console.warn('⚠️ Airtable failed, falling back to Edge Function:', airtableError.message)
-
-    try {
-      // Fallback zur Edge Function mit intelligenter Fallback-Behandlung
-      console.log('🚀 Calling Edge Function for courses...')
-      const courses = await getCoursesFromEdge(50)
-      console.log(`✅ Received ${courses.length} courses from Edge Function`)
-      return courses
-    } catch (edgeError) {
-      console.error('💥 Both Airtable and Edge Function failed:', edgeError.message)
-      return []
-    }
+  } catch (error) {
+    console.error('💥 Failed to load courses from Supabase:', error.message)
+    return []
   }
 }
 
