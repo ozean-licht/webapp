@@ -1,5 +1,5 @@
 import { SpanDesign } from "@/components/span-design"
-import { CourseCard } from "@/components/course-card"
+import { CourseCardModern } from "@/components/course-card-modern"
 import { PrimaryButton } from "@/components/primary-button"
 import { getCoursesFromEdge, getCoursesFromAirtable } from "@/lib/supabase"
 import Link from "next/link"
@@ -21,7 +21,7 @@ async function getFeaturedCourses(): Promise<Course[]> {
   try {
     // Lade Featured Kurse direkt aus Supabase (kein Airtable Fallback)
     console.log('🚀 CoursePreview loading from Supabase...')
-    const courses = await getCoursesFromEdge(5)
+    const courses = await getCoursesFromEdge(4) // Load 4 courses for 2x2 grid
     console.log(`✅ CoursePreview received ${courses.length} courses from Supabase`)
     return courses
   } catch (error) {
@@ -32,8 +32,6 @@ async function getFeaturedCourses(): Promise<Course[]> {
 
 export async function CoursePreview() {
   const courses = await getFeaturedCourses()
-  const featuredCourses = courses.slice(0, 2) // First 2 courses for large cards
-  const smallCourses = courses.slice(2, 5) // Next 3 courses for small cards
 
   return (
     <section className="w-full py-16 px-4">
@@ -53,20 +51,11 @@ export async function CoursePreview() {
           </p>
         </div>
 
-        {/* Featured Course Cards */}
-        {featuredCourses.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-            {featuredCourses.map((course) => (
-              <CourseCard key={course.course_code} course={course} variant="preview" />
-            ))}
-          </div>
-        )}
-
-        {/* Small Course Cards */}
-        {smallCourses.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
-            {smallCourses.map((course) => (
-              <CourseCard key={course.course_code} course={course} variant="small" />
+        {/* Modern Course Cards in 2x2 Grid */}
+        {courses.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
+            {courses.map((course) => (
+              <CourseCardModern key={course.course_code} course={course} />
             ))}
           </div>
         )}

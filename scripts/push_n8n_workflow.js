@@ -6,8 +6,10 @@ const path = require('path');
 class N8NWorkflowManager {
   constructor() {
     this.n8nApiKey = process.env['N8N_API_KEY'] || process.env['X-N8N-API-KEY'];
-    this.n8nUrl = process.env['N8N_URL'] || 'https://n8n.ozean-licht.com/api/v1';
-    this.workflowsDir = path.join(__dirname, 'workflows', 'n8n');
+    this.n8nUrl = (process.env['N8N_URL'] || 'https://n8n.ozean-licht.com/').replace(/\/$/, ''); // Entferne trailing slash
+    this.n8nUrl = `${this.n8nUrl}/api/v1`; // Füge API version hinzu
+    this.workflowsDir = path.join(__dirname, 'workflows');
+    this.n8nWorkflowsDir = path.join(__dirname, 'workflows', 'n8n');
 
     if (!this.n8nApiKey) {
       throw new Error('N8N_API_KEY oder X-N8N-API-KEY nicht in .env.local gefunden');
@@ -35,29 +37,35 @@ class N8NWorkflowManager {
   async listLocalWorkflows() {
     const workflows = [];
 
-    if (!fs.existsSync(this.workflowsDir)) {
-      console.log('📁 Workflows-Verzeichnis nicht gefunden:', this.workflowsDir);
+    // Check both directories
+    const directories = [this.workflowsDir, this.n8nWorkflowsDir].filter(dir => fs.existsSync(dir));
+
+    if (directories.length === 0) {
+      console.log('📁 Keine Workflow-Verzeichnisse gefunden:', [this.workflowsDir, this.n8nWorkflowsDir]);
       return workflows;
     }
 
-    const files = fs.readdirSync(this.workflowsDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    for (const dir of directories) {
+      console.log(`🔍 Durchsuche ${dir}`);
+      const files = fs.readdirSync(dir);
+      const jsonFiles = files.filter(file => file.endsWith('.json'));
 
-    for (const file of jsonFiles) {
-      try {
-        const filePath = path.join(this.workflowsDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        const workflow = JSON.parse(content);
+      for (const file of jsonFiles) {
+        try {
+          const filePath = path.join(dir, file);
+          const content = fs.readFileSync(filePath, 'utf8');
+          const workflow = JSON.parse(content);
 
-        workflows.push({
-          file: file,
-          path: filePath,
-          data: workflow,
-          name: workflow.name || file.replace('.json', ''),
-          id: workflow.id
-        });
-      } catch (error) {
-        console.error(`❌ Fehler beim Laden ${file}:`, error.message);
+          workflows.push({
+            file: file,
+            path: filePath,
+            data: workflow,
+            name: workflow.name || file.replace('.json', ''),
+            id: workflow.id
+          });
+        } catch (error) {
+          console.error(`❌ Fehler beim Laden ${file}:`, error.message);
+        }
       }
     }
 

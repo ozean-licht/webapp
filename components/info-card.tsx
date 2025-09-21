@@ -42,8 +42,12 @@ export function InfoCard({ heading, paragraph, icon }: InfoCardProps) {
             <div className="relative animate-pulse">
               <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse"></div>
               <div className="relative z-10">
-                {icon || (
-                  <svg className="w-6 h-6 text-primary drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {icon ? (
+                  <div style={{ color: "#188689" }}>
+                    {icon}
+                  </div>
+                ) : (
+                  <svg className="w-6 h-6 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "#188689" }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 )}
@@ -116,8 +120,12 @@ export function InfoCardWithButton({ heading, paragraph, icon, buttonText, butto
             <div className="relative animate-pulse">
               <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse"></div>
               <div className="relative z-10">
-                {icon || (
-                  <svg className="w-6 h-6 text-primary drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {icon ? (
+                  <div style={{ color: "#188689" }}>
+                    {icon}
+                  </div>
+                ) : (
+                  <svg className="w-6 h-6 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "#188689" }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 )}

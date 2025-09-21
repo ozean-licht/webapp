@@ -10,7 +10,7 @@ export function BookPromo() {
           <div className="relative">
             <div className="bg-gradient-to-br from-primary/10 to-transparent rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
               <img
-                src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Kosmische_Codes.png"
+                src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/book-promo-cover.webp"
                 alt="Kosmische Codes Buch von Lia Lohmann"
                 className="w-full max-w-md mx-auto transform rotate-3 hover:rotate-0 transition-transform duration-500"
               />

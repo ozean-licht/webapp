@@ -65,6 +65,11 @@ const { data, error } = await supabase.auth.signUp({
 - `components/` - Reusable UI components (prepared for shadcn/ui)
 - `lib/` - Utility functions and configurations
 - `middleware.ts` - Supabase authentication middleware
+- `scripts/` - Development and deployment scripts
+- `sql/` - Database migration files
+- `assets/` - Static assets and processed images
+- `workflows/` - N8N workflow configurations
+- `supabase/` - Supabase Edge Functions and configuration
 
 ## Supabase Edge Functions
 
@@ -115,24 +120,28 @@ SEND_EMAIL_HOOK_SECRET=your_webhook_secret
 
 ### Scripts Overview
 
+All development and deployment scripts are organized in the `scripts/` directory:
+
 ```bash
 # Start development server
 npm run dev
 
-# Sync courses from Airtable (LOW LOAD VERSION - 2 per batch, 3s delay)
-node sync-airtable-courses.js sync
+# Course synchronization scripts
+npm run sync:airtable          # Sync courses from Airtable (preview)
+npm run sync:all               # Sync all courses from Airtable
 
-# Sync only first 5 courses for testing
-node sync-airtable-courses.js sync 5
+# Or run scripts directly:
+node scripts/sync-airtable-courses.js sync     # Sync courses (LOW LOAD VERSION - 2 per batch, 3s delay)
+node scripts/sync-airtable-courses.js sync 5   # Sync only first 5 courses for testing
+node scripts/sync-airtable-courses.js preview  # Preview courses from Airtable
 
-# Preview courses from Airtable
-node sync-airtable-courses.js preview
+# Thumbnail processing
+node scripts/fix-missing-thumbnails.js         # Fix missing thumbnails
+node scripts/test-thumbnail-fix.js             # Test thumbnail processing
 
-# Fix missing thumbnails (for courses without thumbnails)
-node fix-missing-thumbnails.js
-
-# Test thumbnail processing
-node test-thumbnail-fix.js
+# Testing scripts
+npm run test:function                           # Run various function tests
+npm run test:webhook                           # Test webhook functionality
 ```
 
 ### Thumbnail Processing Problem & Solution
@@ -157,10 +166,10 @@ node test-thumbnail-fix.js
 
 ```bash
 # 1. Teste die neue Edge Function
-node test-thumbnail-fix.js
+node scripts/test-thumbnail-fix.js
 
 # 2. Repariere fehlende Thumbnails
-node fix-missing-thumbnails.js
+node scripts/fix-missing-thumbnails.js
 
 # 3. Überprüfe das Ergebnis auf localhost:3001/courses
 ```

@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { MagicLinkForm } from "@/components/magic-link-form"
+import { CTA2 } from "@/components/cta-2"
 import { Footer } from "@/components/footer"
 
 export default function MagicLinkPage() {
@@ -11,6 +12,7 @@ export default function MagicLinkPage() {
           <MagicLinkForm />
         </div>
       </main>
+      <CTA2 />
       <Footer />
     </div>
   )

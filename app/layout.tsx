@@ -38,9 +38,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`font-sans ${cinzelDecorative.variable} ${montserrat.variable} ${montserratAlternates.variable}`}
+        className={`font-sans bg-background text-foreground ${cinzelDecorative.variable} ${montserrat.variable} ${montserratAlternates.variable}`}
       >
         <Suspense fallback={null}>{children}</Suspense>
         <SpeedInsights />

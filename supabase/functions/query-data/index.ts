@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -25,6 +25,22 @@ interface Course {
   updated_at: string;
 }
 
+interface Blog {
+  slug: string;
+  title: string;
+  category: string;
+  content: string;
+  excerpt: string;
+  author: string;
+  read_time_minutes: number;
+  is_published: boolean;
+  thumbnail_url_desktop?: string;
+  thumbnail_url_mobile?: string;
+  published_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface Profile {
   id: string;
   user_id: string;
@@ -37,13 +53,14 @@ interface Profile {
 }
 
 interface QueryRequest {
-  endpoint: 'courses' | 'profiles' | 'course' | 'profile';
+  endpoint: 'courses' | 'blogs' | 'profiles' | 'course' | 'blog' | 'profile' | 'partner-deal-courses';
   params?: {
     slug?: string;
     id?: string;
     user_id?: string;
     limit?: number;
     published_only?: boolean;
+    min_price?: number;
   };
 }
 
@@ -84,8 +101,8 @@ function createFallbackImage(title: string): string {
 }
 
 // Course Query Functions
-async function getCourses(limit: number = 50, publishedOnly: boolean = true): Promise<Course[]> {
-  console.log(`🔍 Querying courses: limit=${limit}, published=${publishedOnly}`);
+async function getCourses(limit: number = 50, publishedOnly: boolean = true, minPrice?: number): Promise<Course[]> {
+  console.log(`🔍 Querying courses: limit=${limit}, published=${publishedOnly}, min_price=${minPrice || 'none'}`);
 
   let query = supabase
     .from('courses')
@@ -95,6 +112,10 @@ async function getCourses(limit: number = 50, publishedOnly: boolean = true): Pr
 
   if (publishedOnly) {
     query = query.eq('is_published', true);
+  }
+
+  if (minPrice !== undefined) {
+    query = query.gte('price', minPrice);
   }
 
   const { data: courses, error } = await query;
@@ -137,6 +158,49 @@ async function getCourses(limit: number = 50, publishedOnly: boolean = true): Pr
   return courses || [];
 }
 
+// Spezifische Funktion für Partner Deal Kurse
+async function getPartnerDealCourses(limit: number = 50): Promise<Course[]> {
+  console.log(`🎯 Querying Partner Deal courses: price between 100-1000€, limit=${limit}`);
+
+  let query = supabase
+    .from('courses')
+    .select('*')
+    .eq('is_published', true)
+    .gte('price', 100)
+    .lte('price', 1000)
+    .order('price', { ascending: false })
+    .limit(limit);
+
+  const { data: courses, error } = await query;
+
+  if (error) {
+    console.error('❌ Partner Deal courses query error:', error.message);
+    throw new Error(`Database error: ${error.message}`);
+  }
+
+  console.log(`✅ Found ${courses?.length || 0} Partner Deal courses (100-1000€)`);
+
+  // Verarbeite problematische Kurse und erstelle Fallbacks
+  if (courses) {
+    courses.forEach(course => {
+      const isProblematic = PROBLEMATIC_COURSES.some(problemSlug =>
+        course.slug.includes(problemSlug)
+      );
+
+      if (isProblematic) {
+        console.log(`🚨 Problematic course detected: ${course.title.substring(0, 50)}...`);
+        console.log(`   Generating fallback images...`);
+
+        const fallbackUrl = createFallbackImage(course.title);
+        course.thumbnail_url_desktop = fallbackUrl;
+        course.thumbnail_url_mobile = fallbackUrl;
+      }
+    });
+  }
+
+  return courses || [];
+}
+
 async function getCourse(slug: string): Promise<Course | null> {
   console.log(`🔍 Querying single course: ${slug}`);
 
@@ -172,6 +236,55 @@ async function getCourse(slug: string): Promise<Course | null> {
   }
 
   return course;
+}
+
+// Blog Query Functions
+async function getBlogs(limit: number = 50, publishedOnly: boolean = true): Promise<Blog[]> {
+  console.log(`🔍 Querying blogs: limit=${limit}, published=${publishedOnly}`);
+
+  let query = supabase
+    .from('blogs')
+    .select('*')
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (publishedOnly) {
+    query = query.eq('is_published', true);
+  }
+
+  const { data: blogs, error } = await query;
+
+  if (error) {
+    console.error('❌ Blog query error:', error.message);
+    throw new Error(`Database error: ${error.message}`);
+  }
+
+  console.log(`✅ Found ${blogs?.length || 0} blogs`);
+
+  return blogs || [];
+}
+
+async function getBlog(slug: string): Promise<Blog | null> {
+  console.log(`🔍 Querying single blog: ${slug}`);
+
+  const { data: blog, error } = await supabase
+    .from('blogs')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_published', true)
+    .single();
+
+  if (error) {
+    console.error('❌ Single blog query error:', error.message);
+    if (error.code === 'PGRST116') {
+      return null; // Blog not found
+    }
+    throw new Error(`Database error: ${error.message}`);
+  }
+
+  console.log('✅ Blog found:', blog.title);
+
+  return blog;
 }
 
 // Profile Query Functions
@@ -228,13 +341,25 @@ async function handleQuery(request: QueryRequest) {
 
   switch (endpoint) {
     case 'courses':
-      return await getCourses(params.limit || 50, params.published_only !== false);
+      return await getCourses(params.limit || 50, params.published_only !== false, params.min_price);
+
+    case 'partner-deal-courses':
+      return await getPartnerDealCourses(params.limit || 50);
+
+    case 'blogs':
+      return await getBlogs(params.limit || 50, params.published_only !== false);
 
     case 'course':
       if (!params.slug) {
         throw new Error('Slug parameter required for course endpoint');
       }
       return await getCourse(params.slug);
+
+    case 'blog':
+      if (!params.slug) {
+        throw new Error('Slug parameter required for blog endpoint');
+      }
+      return await getBlog(params.slug);
 
     case 'profiles':
       return await getProfiles(params.limit || 50);
@@ -266,10 +391,23 @@ serve(async (req) => {
         return new Response(JSON.stringify({
           error: 'Missing endpoint parameter',
           usage: 'GET /?endpoint=courses&limit=50&published_only=true',
-          available_endpoints: ['courses', 'profiles', 'course', 'profile']
+          examples: [
+            'GET /?endpoint=courses&limit=50&published_only=true',
+            'GET /?endpoint=blogs&limit=20&published_only=true',
+            'GET /?endpoint=partner-deal-courses&limit=20',
+            'GET /?endpoint=course&slug=energy-code-basic',
+            'GET /?endpoint=blog&slug=my-blog-post',
+            'GET /?endpoint=courses&min_price=100'
+          ],
+          available_endpoints: ['courses', 'blogs', 'partner-deal-courses', 'course', 'blog', 'profiles', 'profile']
         }), {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          }
         });
       }
 
@@ -282,8 +420,14 @@ serve(async (req) => {
       const publishedOnly = url.searchParams.get('published_only');
       if (publishedOnly !== null) params.published_only = publishedOnly === 'true';
 
+      const minPrice = url.searchParams.get('min_price');
+      if (minPrice) params.min_price = parseInt(minPrice);
+
       // Parse endpoint-specific parameters
       switch (endpoint) {
+        case 'partner-deal-courses':
+          // No additional parameters needed, uses default min_price=100
+          break;
         case 'course':
           params.slug = url.searchParams.get('slug') || undefined;
           break;
@@ -299,7 +443,22 @@ serve(async (req) => {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=300' // 5 minutes cache
+          'Cache-Control': 'public, max-age=300', // 5 minutes cache
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      });
+    }
+
+    // Handle OPTIONS requests for CORS
+    if (req.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         }
       });
     }
@@ -313,7 +472,10 @@ serve(async (req) => {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=300' // 5 minutes cache
+          'Cache-Control': 'public, max-age=300', // 5 minutes cache
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         }
       });
     }
@@ -321,10 +483,15 @@ serve(async (req) => {
     // Method not allowed
     return new Response(JSON.stringify({
       error: 'Method not allowed',
-      allowed_methods: ['GET', 'POST']
+      allowed_methods: ['GET', 'POST', 'OPTIONS']
     }), {
       status: 405,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
     });
 
   } catch (error) {
@@ -336,7 +503,12 @@ serve(async (req) => {
       timestamp: new Date().toISOString()
     }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
     });
   }
 });

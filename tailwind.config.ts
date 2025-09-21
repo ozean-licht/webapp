@@ -10,17 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#00D4FF",
-          50: "#E6F9FF",
-          100: "#CCF3FF",
-          200: "#99E7FF",
-          300: "#66DBFF",
-          400: "#33CFFF",
-          500: "#00D4FF",
-          600: "#00A8CC",
-          700: "#007C99",
-          800: "#005066",
-          900: "#002433",
+          DEFAULT: "#0ec2bc",
+          50: "#E6F8F7",
+          100: "#CCF1F0",
+          200: "#99E3E1",
+          300: "#66D5D2",
+          400: "#33C7C3",
+          500: "#0ec2bc",
+          600: "#0BA09A",
+          700: "#087E78",
+          800: "#065C56",
+          900: "#033A34",
         },
         background: "#0A0F1A",
         foreground: "#FFFFFF",
@@ -47,8 +47,8 @@ const config: Config = {
       },
       keyframes: {
         glow: {
-          '0%': { boxShadow: '0 0 20px rgba(0, 212, 255, 0.3)' },
-          '100%': { boxShadow: '0 0 30px rgba(0, 212, 255, 0.6)' },
+          '0%': { boxShadow: '0 0 20px rgba(14, 194, 188, 0.3)' },
+          '100%': { boxShadow: '0 0 30px rgba(14, 194, 188, 0.6)' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },

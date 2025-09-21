@@ -21,3 +21,15 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/process-course-thumbnail/deno.json"
 entrypoint = "./functions/process-course-thumbnail/index.ts"
+
+[functions.process-blog-thumbnail]
+enabled = true
+verify_jwt = false
+import_map = "./functions/process-blog-thumbnail/deno.json"
+entrypoint = "./functions/process-blog-thumbnail/index.ts"
+
+[functions.process-author-image]
+enabled = true
+verify_jwt = false
+import_map = "./functions/process-author-image/deno.json"
+entrypoint = "./functions/process-author-image/index.ts"

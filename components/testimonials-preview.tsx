@@ -1,3 +1,4 @@
+import Link from "next/link"
 import SpanBadge from "./span-badge"
 import PrimaryButton from "./primary-button"
 import TestimonialCard from "./testimonial-card"
@@ -45,10 +46,12 @@ export default function TestimonialsPreview() {
               </div>
             </div>
 
-            <PrimaryButton>
-              Alle Feedbacks
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </PrimaryButton>
+            <Link href="/feedback">
+              <PrimaryButton>
+                Alle Feedbacks
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </PrimaryButton>
+            </Link>
           </div>
 
           {/* Right Testimonials */}

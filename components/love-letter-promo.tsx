@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SpanBadge } from "@/components/span-badge"
 import { PrimaryButton } from "@/components/primary-button"
 
@@ -10,7 +11,7 @@ export function LoveLetterPromo() {
           <div>
             <div className="p-2 rounded-xl border border-border" style={{ backgroundColor: "#00151A" }}>
               <img
-                src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Love_Letter_Promo.png"
+                src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/love-letter-promo.webp"
                 alt="Love Letter Promo"
                 className="w-full h-auto rounded-lg"
               />
@@ -36,7 +37,9 @@ export function LoveLetterPromo() {
             </div>
 
             <div className="pt-4">
-              <PrimaryButton>Zu Love Letter</PrimaryButton>
+              <Link href="/love-letter">
+                <PrimaryButton>Beitrag einreichen →</PrimaryButton>
+              </Link>
             </div>
           </div>
         </div>

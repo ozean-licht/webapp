@@ -1,0 +1,577 @@
+{
+  "name": "Airtable Blogs to Supabase Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hours": 1
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "application": "airtable",
+        "operation": "getAll",
+        "baseId": "app5e7mJQhxDYD5Zy",
+        "table": "blogs",
+        "returnAll": true,
+        "options": {
+          "fields": [
+            "title",
+            "slug",
+            "category",
+            "content",
+            "excerpt",
+            "description",
+            "author",
+            "author_image",
+            "read_time_minutes",
+            "is_published",
+            "thumbnail",
+            "published_at",
+            "created_at",
+            "updated_at"
+          ],
+          "filterByFormula": "AND(IS_AFTER({updated_at}, DATEADD(NOW(), -1, 'hours')))"
+        }
+      },
+      "name": "Get Airtable Records",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "airtableApi": {
+          "id": "airtable-api-key",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      },
+      "name": "Delay",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        900,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "code": "// Map Airtable fields to Supabase format\n\nconst blog = $input.item.json;\n\nreturn {\n  json: {\n    title: blog.fields.title || '',\n    slug: blog.fields.slug || '',\n    category: blog.fields.category || 'Community Love Letter',\n    content: blog.fields.content || '',\n    excerpt: blog.fields.excerpt || '',\n    description: blog.fields.description || '',\n    author: blog.fields.author_name || 'Lia Lohmann',\n    author_image_url: blog.fields.author_image && blog.fields.author_image[0] ? blog.fields.author_image[0].url : null,\n    read_time_minutes: blog.fields.read_time_minutes || 5,\n    is_published: blog.fields.is_published !== undefined ? blog.fields.is_published : true,\n    thumbnail_url: blog.fields.thumbnail && blog.fields.thumbnail[0] ? blog.fields.thumbnail[0].url : null,\n    airtable_id: blog.id,\n    airtable_created_at: blog.fields.created_at || null,\n    airtable_updated_at: blog.fields.updated_at || null,\n    published_at: blog.fields.published_at || new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Map Blog Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.thumbnail_url }}",
+              "operation": "isEmpty"
+            }
+          ]
+        },
+        "combineOperation": "any",
+        "options": {}
+      },
+      "name": "Check Thumbnail Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/blogs?slug=eq.{{ $json.slug }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Check Blog Exists",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1340,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $response.statusCode }}",
+              "value2": 200,
+              "operation": "equal"
+            },
+            {
+              "value1": "={{ $response.body.length }}",
+              "value2": 0,
+              "operation": "greaterThan"
+            }
+          ]
+        },
+        "combineOperation": "all",
+        "options": {}
+      },
+      "name": "Blog Exists Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/blogs",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "slug",
+              "value": "={{ $json.slug }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $json.author }}"
+            },
+            {
+              "name": "author_image_url",
+              "value": "={{ $json.author_image_url }}"
+            },
+            {
+              "name": "read_time_minutes",
+              "value": "={{ $json.read_time_minutes }}"
+            },
+            {
+              "name": "is_published",
+              "value": "={{ $json.is_published }}"
+            },
+            {
+              "name": "published_at",
+              "value": "={{ $json.published_at }}"
+            },
+            {
+              "name": "updated_at",
+              "value": "={{ $json.updated_at }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Insert Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/blogs?slug=eq.{{ $json.slug }}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $json.author }}"
+            },
+            {
+              "name": "author_image_url",
+              "value": "={{ $json.author_image_url }}"
+            },
+            {
+              "name": "read_time_minutes",
+              "value": "={{ $json.read_time_minutes }}"
+            },
+            {
+              "name": "is_published",
+              "value": "={{ $json.is_published }}"
+            },
+            {
+              "name": "published_at",
+              "value": "={{ $json.published_at }}"
+            },
+            {
+              "name": "updated_at",
+              "value": "={{ $json.updated_at }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Update Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/process-blog-thumbnail",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "blog_slug",
+              "value": "={{ $json.slug }}"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $json.thumbnail_url }}"
+            },
+            {
+              "name": "action",
+              "value": "process_4_variants"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Thumbnails",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/process-blog-thumbnail",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "blog_slug",
+              "value": "={{ $json.slug }}"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $json.thumbnail_url }}"
+            },
+            {
+              "name": "action",
+              "value": "process_4_variants"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Thumbnails Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Airtable Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Airtable Records": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay": {
+      "main": [
+        [
+          {
+            "node": "Map Blog Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Blog Fields": {
+      "main": [
+        [
+          {
+            "node": "Check Thumbnail Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Thumbnail Exists": {
+      "main": [
+        [
+          {
+            "node": "Check Blog Exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Blog Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Blog Exists": {
+      "main": [
+        [
+          {
+            "node": "Blog Exists Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Exists Check": {
+      "main": [
+        [
+          {
+            "node": "Update Blog",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Blog": {
+      "main": [
+        [
+          {
+            "node": "Process Thumbnails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Blog": {
+      "main": [
+        [
+          {
+            "node": "Process Thumbnails Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/Berlin",
+    "executionOrder": "v1"
+  },
+  "staticData": null
+}

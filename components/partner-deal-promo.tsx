@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { PrimaryButton } from "./primary-button"
 import { SpanBadge } from "./span-badge"
 import { SpanDesign } from "./span-design"
@@ -25,16 +26,18 @@ export function PartnerDealPromo() {
         </div>
 
         <div className="mb-8">
-          <div className="inline-block p-2 rounded-3xl" style={{ backgroundColor: "#00151A" }}>
+          <div className="inline-block p-2 rounded-3xl border-2" style={{ backgroundColor: "#00151A", borderColor: "#052a2a" }}>
             <img
-              src="https://framerusercontent.com/images/zZvjbXkhJuXxaMkYRx2M7tE14iQ.webp?width=1080&height=1080"
+              src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/partner-deal-cover-komprimiert.webp"
               alt="Happy couple - Partner Special Deal"
               className="w-full max-w-[600px] h-auto rounded-2xl object-cover"
             />
           </div>
         </div>
 
-        <PrimaryButton>Zum Partner Deal →</PrimaryButton>
+        <Link href="/partner-deal">
+          <PrimaryButton>Zum Partner Deal →</PrimaryButton>
+        </Link>
       </div>
     </section>
   )

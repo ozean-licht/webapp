@@ -215,6 +215,81 @@ export async function getCourseWithReliableImages(slug: string) {
   }
 }
 
+// Funktion für Partner Deal - Kurse über 100€
+export async function getCoursesForPartnerDeal(): Promise<any[]> {
+  try {
+    console.log('🚀 Loading courses over 100€ for Partner Deal via Edge Function...');
+
+    // Verwende die bestehende query-data Edge Function
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const edgeFunctionUrl = `${supabaseUrl}/functions/v1/query-data?endpoint=partner-deal-courses&limit=50`;
+
+    const response = await fetch(edgeFunctionUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      console.error('❌ Edge Function error:', response.status, response.statusText);
+      throw new Error(`Edge Function returned ${response.status}`);
+    }
+
+    const courses = await response.json();
+
+    if (!Array.isArray(courses)) {
+      console.error('❌ Unexpected response format:', courses);
+      return [];
+    }
+
+    console.log(`✅ Loaded ${courses.length} courses over 100€ for Partner Deal via Edge Function`);
+
+    // Debug: Zeige erste paar Kurse
+    if (courses.length > 0) {
+      console.log('📊 Sample Partner Deal courses:', courses.slice(0, 3).map(c => ({
+        title: c.title,
+        price: c.price,
+        slug: c.slug
+      })));
+    }
+
+    return courses;
+  } catch (error) {
+    console.error('💥 Error loading Partner Deal courses via Edge Function:', error);
+    // Fallback zur direkten Supabase-Abfrage falls Edge Function fehlschlägt
+    console.log('🔄 Falling back to direct Supabase query...');
+    return await getCoursesForPartnerDealFallback();
+  }
+}
+
+// Fallback-Funktion falls Edge Function nicht funktioniert
+async function getCoursesForPartnerDealFallback(): Promise<any[]> {
+  try {
+    console.log('🔄 Using fallback: Direct Supabase query for Partner Deal courses...');
+
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('is_published', true)
+      .gte('price', 100)
+      .order('price', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('❌ Fallback query error:', error.message);
+      return [];
+    }
+
+    console.log(`✅ Fallback loaded ${data?.length || 0} courses over 100€`);
+    return data || [];
+  } catch (error) {
+    console.error('💥 Fallback also failed:', error);
+    return [];
+  }
+}
+
 // Profile Query Functions (direkte Supabase-Abfragen)
 export async function getProfilesFromEdge(limit: number = 50): Promise<any[]> {
   try {
@@ -285,6 +360,74 @@ async function getProfileDirect(id?: string, userId?: string): Promise<any | nul
     return data;
   } catch (error) {
     console.error('💥 Direct profile query failed:', error);
+    return null;
+  }
+}
+
+// Blog Query Functions (direkte Supabase-Abfragen)
+export async function getBlogsFromEdge(limit: number = 50): Promise<any[]> {
+  try {
+    console.log('🚀 Loading blogs directly from Supabase...');
+    const blogs = await getBlogsDirect(limit);
+    console.log(`✅ Loaded ${blogs.length} blogs`);
+    return blogs;
+  } catch (error) {
+    console.error('❌ Direct query failed:', error);
+    return [];
+  }
+}
+
+export async function getBlogFromEdge(slug: string): Promise<any | null> {
+  try {
+    console.log('🚀 Loading single blog from Supabase...');
+    const blog = await getBlogDirect(slug);
+    console.log(`✅ Loaded blog: ${blog?.title || 'Not found'}`);
+    return blog;
+  } catch (error) {
+    console.error('❌ Direct query failed:', error);
+    return null;
+  }
+}
+
+// Fallback functions für direkte Blog-Datenbank-Abfragen
+async function getBlogsDirect(limit: number = 50): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('❌ Direct blogs query error:', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('💥 Direct blogs query failed:', error);
+    return [];
+  }
+}
+
+async function getBlogDirect(slug: string): Promise<any | null> {
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .single();
+
+    if (error) {
+      console.error('❌ Direct blog query error:', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('💥 Direct blog query failed:', error);
     return null;
   }
 }

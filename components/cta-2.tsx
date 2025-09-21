@@ -26,15 +26,15 @@ export function CTA2() {
         <div className="relative mb-8">
           {/* Animated people ticker - left side */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-48 hidden lg:block">
-            <div className="bg-[#001212]/80 border-t border-b border-l border-[#0E282E] rounded-l-lg py-2 px-3 overflow-hidden">
-              <div className="flex animate-scroll-right space-x-2">
+            <div className="bg-[#001212]/80 border-t border-b border-l border-[#0E282E] rounded-l-full py-2 px-3 overflow-hidden">
+              <div className="flex animate-scroll-right gap-2">
                 {[...peopleImages, ...peopleImages, ...peopleImages].map((src, index) => (
                   <div key={`left-${index}`} className="flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+                    <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-[#00151A] p-0.5">
                       <img
                         src={src || "/placeholder.svg"}
                         alt="Person illustration"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-full"
                       />
                     </div>
                   </div>
@@ -45,15 +45,15 @@ export function CTA2() {
 
           {/* Animated people ticker - right side */}
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 hidden lg:block">
-            <div className="bg-[#001212]/80 border-t border-b border-r border-[#0E282E] rounded-r-lg py-2 px-3 overflow-hidden">
-              <div className="flex animate-scroll-left space-x-2">
+            <div className="bg-[#001212]/80 border-t border-b border-r border-[#0E282E] rounded-r-full py-2 px-3 overflow-hidden">
+              <div className="flex animate-scroll-left gap-2">
                 {[...peopleImages, ...peopleImages, ...peopleImages].map((src, index) => (
                   <div key={`right-${index}`} className="flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+                    <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-[#00151A] p-0.5">
                       <img
                         src={src || "/placeholder.svg"}
                         alt="Person illustration"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-full"
                       />
                     </div>
                   </div>
@@ -136,20 +136,21 @@ export function CTA2() {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(0%); }
         }
-        
+
         @keyframes scroll-left {
           0% { transform: translateX(0%); }
           100% { transform: translateX(-100%); }
         }
-        
+
         .animate-scroll-right {
           animation: scroll-right 30s linear infinite;
         }
-        
+
         .animate-scroll-left {
           animation: scroll-left 30s linear infinite;
         }
       `}</style>
+
     </section>
   )
 }

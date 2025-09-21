@@ -1,59 +1,32 @@
-import { SpanBadge } from "./span-badge"
 import { SpanDesign } from "./span-design"
+import { getBlogsFromEdge } from "@/lib/supabase"
+import Link from "next/link"
+import { PrimaryButton } from "./primary-button"
+import { BlogItem } from "./blog-item"
 
 interface BlogPost {
-  id: string
+  slug: string
   title: string
   category: string
-  date: string
-  readTime: string
-  image: string
+  published_at: string
+  read_time_minutes: number
+  thumbnail_url_desktop?: string
+  thumbnail_url_mobile?: string
+  excerpt: string
 }
 
-const blogPosts: BlogPost[] = [
-  {
-    id: "1",
-    title: "Kids Ascension nimmt Gestalt an - Update unserer App",
-    category: "Update / Announcement",
-    date: "04.04.2025",
-    readTime: "4 min",
-    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Kids-ascension-update.webp",
-  },
-  {
-    id: "2",
-    title: 'Maine Coones - Die „Aliens" unter den Katzen',
-    category: "Community Love Letter",
-    date: "18.03.2025",
-    readTime: "4 min",
-    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Maine%20Coons.png",
-  },
-  {
-    id: "3",
-    title: "Meine Reise zur Herzheilung",
-    category: "Community Love Letter",
-    date: "18.03.2025",
-    readTime: "3 min",
-    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Herz%20Heilung.png",
-  },
-  {
-    id: "4",
-    title: "Ein Wunder ist Geschehen",
-    category: "Community Love Letter",
-    date: "18.03.2025",
-    readTime: "5 min",
-    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Ein%20Wunder%20ist%20Geschehen.png",
-  },
-  {
-    id: "5",
-    title: "Lakhovskys Multi Wellen Gerät",
-    category: "Community Love Letter",
-    date: "18.03.2025",
-    readTime: "8 min",
-    image: "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/Blogs/Covers/Lakovsky.png",
-  },
-]
+async function getLatestBlogs(): Promise<BlogPost[]> {
+  try {
+    const blogs = await getBlogsFromEdge(5) // Get latest 5 blogs
+    return blogs
+  } catch (error) {
+    console.error('Failed to load blogs:', error)
+    return []
+  }
+}
 
-export function BlogPreview() {
+export async function BlogPreview() {
+  const blogPosts = await getLatestBlogs()
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       {/* Header with decorative elements */}
@@ -74,27 +47,27 @@ export function BlogPreview() {
 
       {/* Blog posts grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogPosts.map((post) => (
-          <article key={post.id} className="group cursor-pointer">
-            <div className="relative overflow-hidden rounded-lg border border-[#0E282E] mb-4">
-              <div className="aspect-video">
-                <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover" />
-              </div>
+        {blogPosts.length > 0 ? blogPosts.map((post) => (
+          <BlogItem key={post.slug} blog={post} />
+        )) : (
+          <div className="col-span-full text-center py-16">
+            <div className="text-white/70 text-lg">
+              Aktuell sind keine Artikel verfügbar. Schau bald wieder vorbei!
             </div>
-
-            <div className="space-y-3">
-              <SpanBadge variant="justText">{post.category}</SpanBadge>
-
-              <h3 className="text-white text-xl font-normal leading-tight">{post.title}</h3>
-
-              <div className="flex items-center justify-between text-sm text-gray-400">
-                <span>{post.date}</span>
-                <span>{post.readTime}</span>
-              </div>
-            </div>
-          </article>
-        ))}
+          </div>
+        )}
       </div>
+
+      {/* View all link */}
+      {blogPosts.length > 0 && (
+        <div className="text-center mt-12">
+          <PrimaryButton asChild>
+            <Link href="/magazine">
+              Alle Artikel ansehen →
+            </Link>
+          </PrimaryButton>
+        </div>
+      )}
     </section>
   )
 }

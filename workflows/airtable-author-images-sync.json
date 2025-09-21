@@ -1,0 +1,159 @@
+{
+  "name": "Airtable Author Images to Supabase Sync",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        40,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "application": "airtable",
+        "operation": "getAll",
+        "baseId": "app5e7mJQhxDYD5Zy",
+        "table": "blogs",
+        "returnAll": true,
+        "options": {
+          "fields": [
+            "slug",
+            "author",
+            "author_image"
+          ],
+          "filterByFormula": "AND(IS_AFTER({updated_at}, DATEADD(NOW(), -1, 'hours')))"
+        }
+      },
+      "name": "Get Blogs with Author Images",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "code": "// Filter blogs that have author images\nconst blog = $input.item.json;\n\nif (blog.fields.author_image && blog.fields.author_image.length > 0) {\n  return {\n    json: {\n      slug: blog.fields.slug,\n      author: blog.fields.author_name || 'Lia Lohmann',\n      author_image_url: blog.fields.author_image[0].url\n    }\n  };\n}\n\nreturn null;"
+      },
+      "name": "Filter Blogs with Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/process-author-image",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "imageUrl",
+              "value": "={{ $json.author_image_url }}"
+            },
+            {
+              "name": "slug",
+              "value": "={{ $json.slug }}"
+            },
+            {
+              "name": "authorName",
+              "value": "={{ $json.author }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        }
+      },
+      "name": "Process Author Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        900,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get Blogs with Author Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Blogs with Author Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Blogs with Author Images": {
+      "main": [
+        [
+          {
+            "node": "Filter Blogs with Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Blogs with Images": {
+      "main": [
+        [
+          {
+            "node": "Process Author Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}

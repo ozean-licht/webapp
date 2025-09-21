@@ -139,8 +139,28 @@
   html {
     scroll-behavior: smooth;
   }
+}
 
-  /* Adding global typography hierarchy */
+/* Ticker scroll animations */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+/* Adding global typography hierarchy */
   h1 {
     font-family: var(--font-cinzel-decorative);
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.60);
@@ -190,34 +210,7 @@
     font-family: var(--font-montserrat);
     font-weight: 300; /* Light weight */
   }
-}
 
-/* Adding ticker animations for kids ascension component */
-@keyframes scroll-right {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-@keyframes scroll-left {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.animate-scroll-right {
-  animation: scroll-right 20s linear infinite;
-}
-
-.animate-scroll-left {
-  animation: scroll-left 20s linear infinite;
-}
 
 /* Spin animation for rotating elements */
 @keyframes spin {

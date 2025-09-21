@@ -1,8 +1,23 @@
+import Link from "next/link"
 import { SpanBadge } from "@/components/span-badge"
-import { KidsAscensionTicker } from "@/components/kids-ascension-ticker"
+import { Ticker } from "@/components/ticker"
 import { PrimaryButton } from "@/components/primary-button"
 
 export function KidsAscensionPromo() {
+  // Images for upper ticker (promo-1, promo-2, promo-5)
+  const upperImages = [
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-1.webp",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-2.webp",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-5.webp",
+  ]
+
+  // Images for lower ticker (promo-3, promo-4, promo-6)
+  const lowerImages = [
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-3.webp",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-4.webp",
+    "https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/kids-ascension/promo-preview/promo-6.webp",
+  ]
+
   return (
     <section className="w-full py-16 px-4">
       <div className="max-w-7xl mx-auto">
@@ -25,13 +40,38 @@ export function KidsAscensionPromo() {
             </div>
 
             <div className="pt-4">
-              <PrimaryButton>Zu Kids Ascension</PrimaryButton>
+              <Link href="https://kids-ascension.org" target="_blank" rel="noopener noreferrer">
+                <PrimaryButton>Zu Kids Ascension →</PrimaryButton>
+              </Link>
             </div>
           </div>
 
-          {/* Right side - Ticker */}
-          <div>
-            <KidsAscensionTicker />
+          {/* Right side - Two separate tickers */}
+          <div className="w-full">
+            <div
+              className="w-full overflow-hidden space-y-2 rounded-[10%] border border-[#0E282E] border-border"
+              style={{ backgroundColor: "#00151A", padding: "16px 2px" }}
+            >
+              {/* Upper ticker - moving right (extra-slow - 30% slower than slow) */}
+              <div className="py-2">
+                <Ticker
+                  images={upperImages}
+                  direction="right"
+                  speed="extra-slow"
+                  imageAlt="Kids Ascension Upper"
+                />
+              </div>
+
+              {/* Lower ticker - moving left (very slow - 20% slower than base slow) */}
+              <div className="py-2">
+                <Ticker
+                  images={lowerImages}
+                  direction="left"
+                  speed="slow"
+                  imageAlt="Kids Ascension Lower"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
