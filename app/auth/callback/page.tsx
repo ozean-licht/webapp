@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,7 +17,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const supabase = createSupabaseClient()
+        const supabase = createBrowserSupabaseClient()
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {

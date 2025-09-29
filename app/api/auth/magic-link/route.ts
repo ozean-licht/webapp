@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🔧 Creating Supabase client...')
-    const supabase = createSupabaseClient()
+    const supabase = await createServerSupabaseClient()
 
     // Dynamic redirect URL based on environment
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'

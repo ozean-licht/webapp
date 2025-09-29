@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://suwevnhwtmcazjugfmps.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -7,13 +7,17 @@ if (!supabaseAnonKey) {
   throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
 }
 
-// Client for client-side usage - single instance
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Browser Client for client-side usage
+export function createBrowserSupabaseClient() {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+}
+
+// Legacy compatibility - create a browser client instance for backward compatibility
+export const supabase = createBrowserSupabaseClient()
 
 // Function to create a new client instance (useful for server-side rendering and API routes)
-// Returns the same instance to avoid multiple GoTrueClient instances
 export function createSupabaseClient() {
-  return supabase
+  return createBrowserSupabaseClient()
 }
 
 // ALTERNATIVE: Kurse aus Airtable mit direkten Bild-URLs laden
