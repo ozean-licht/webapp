@@ -54,7 +54,7 @@ export async function getCoursesFromAirtable(limit: number = 50) {
         title: record.fields.title,
         description: record.fields.description || '',
         price: record.fields.price || 0,
-        is_published: record.fields.is_public || false,
+        is_public: record.fields.is_public || false,
         // Verwende DIREKTE Airtable URLs - viel zuverlässiger!
         thumbnail_url_desktop: record.fields.thumbnail ? record.fields.thumbnail[0].url : null,
         thumbnail_url_mobile: record.fields.thumbnail ? record.fields.thumbnail[0].url : null,
@@ -132,7 +132,7 @@ async function getCoursesDirect(limit: number = 50): Promise<any[]> {
     const { data, error } = await supabase
       .from('courses')
       .select('*')
-      .eq('is_published', true)
+      .eq('is_public', true)
       .order('updated_at', { ascending: false })
       .limit(limit)
 
@@ -154,7 +154,7 @@ async function getCourseDirect(slug: string): Promise<any | null> {
       .from('courses')
       .select('*')
       .eq('slug', slug)
-      .eq('is_published', true)
+      .eq('is_public', true)
       .single()
 
     if (error) {
@@ -276,7 +276,7 @@ async function getCoursesForPartnerDealFallback(): Promise<any[]> {
     const { data, error } = await supabase
       .from('courses')
       .select('*')
-      .eq('is_published', true)
+      .eq('is_public', true)
       .gte('price', 100)
       .order('price', { ascending: false })
       .limit(50);
@@ -399,7 +399,7 @@ async function getBlogsDirect(limit: number = 50): Promise<any[]> {
     const { data, error } = await supabase
       .from('blogs')
       .select('*')
-      .eq('is_published', true)
+      // Removed .eq('is_public', true) - column doesn't exist in schema
       .order('published_at', { ascending: false })
       .limit(limit);
 
@@ -421,7 +421,7 @@ async function getBlogDirect(slug: string): Promise<any | null> {
       .from('blogs')
       .select('*')
       .eq('slug', slug)
-      .eq('is_published', true)
+      // Removed .eq('is_public', true) - column doesn't exist in schema
       .single();
 
     if (error) {

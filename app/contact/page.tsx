@@ -16,7 +16,7 @@ export default function ContactPage() {
           <div className="mb-6">
             <SpanDesign>Kontakt</SpanDesign>
           </div>
-          <h1 className="text-4xl md:text-6xl font-cinzel text-white mb-8">
+          <h1 className="text-4xl md:text-6xl font-cinzel-decorative text-white mb-8">
             Kontaktiere Uns
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-[#001212]/60 border border-[#0E282E] rounded-2xl p-8 md:p-12">
             <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-cinzel text-white mb-4">
+              <h2 className="text-2xl md:text-3xl font-cinzel-decorative text-white mb-4">
                 Formular Senden
               </h2>
               <p className="text-muted-foreground">
@@ -165,7 +165,7 @@ export default function ContactPage() {
             <div className="mb-6">
               <SpanDesign>Häufige Fragen</SpanDesign>
             </div>
-            <h2 className="text-3xl md:text-4xl font-cinzel text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white mb-6">
               Du hast Fragen? Wir haben Antworten.
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

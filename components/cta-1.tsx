@@ -56,7 +56,7 @@ export function CTA1() {
           </div>
 
           {/* Main Heading */}
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-cinzel text-white mb-12 text-balance xl:text-6xl">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-cinzel-decorative text-white mb-12 text-balance xl:text-6xl">
             Dein Weg mit Mir
           </h2>
 

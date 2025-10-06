@@ -9,7 +9,7 @@ interface Course {
   title: string
   description: string
   price: number
-  is_published: boolean
+  is_public: boolean
   thumbnail_url_desktop?: string
   thumbnail_url_mobile?: string
   course_code: number
@@ -41,7 +41,7 @@ export async function CoursePreview() {
           <div className="mb-6">
             <SpanDesign>Einblick & Vorschau</SpanDesign>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel text-white mb-6 text-balance">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel-decorative text-white mb-6 text-balance">
             {"Unsere aktuellen Weiterbildungskurse"}
           </h2>
           <p className="text-white/70 font-montserrat-alt text-lg max-w-2xl mx-auto">

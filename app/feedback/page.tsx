@@ -101,7 +101,7 @@ export default function FeedbackPage() {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <SpanDesign>Community Feedbacks</SpanDesign>
 
-            <h1 className="font-cinzel text-4xl md:text-5xl lg:text-6xl text-white leading-tight">
+            <h1 className="font-cinzel-decorative text-4xl md:text-5xl lg:text-6xl text-white leading-tight">
               Das Sagen Unsere
               <br />
               Soulfamily Members
@@ -127,7 +127,7 @@ export default function FeedbackPage() {
         <section className="py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4">
+              <h2 className="font-cinzel-decorative text-3xl md:text-4xl text-white mb-4">
                 Erfahrungsberichte
               </h2>
               <p className="text-gray-300 text-lg">

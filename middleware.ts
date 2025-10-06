@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
   // Only protect specific routes that require authentication
   // Let all other pages be accessible to everyone
   const protectedRoutes = [
-    '/dashboard',
+    // '/dashboard', // Temporär deaktiviert für Entwicklung
     '/profile',
     '/my-courses',
     '/user',

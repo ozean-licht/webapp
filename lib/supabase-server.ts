@@ -9,7 +9,7 @@ if (!supabaseAnonKey) {
 }
 
 // Server Client for server-side usage (SSR, API routes, middleware)
-export async function createServerSupabaseClient() {
+export async function createClient() {
   const cookieStore = await cookies()
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -31,5 +31,8 @@ export async function createServerSupabaseClient() {
     },
   })
 }
+
+// Alias for compatibility
+export const createServerSupabaseClient = createClient
 
 

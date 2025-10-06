@@ -1,0 +1,330 @@
+{
+  "name": "Ablefy Transaction Sync",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "ablefy-transaction-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "get",
+        "baseId": "app5e7mJQhxDYD5Zy",
+        "tableId": "tblqaRqGbbYKRpE6W",
+        "recordId": "={{$json[\"record_id\"]}}"
+      },
+      "id": "airtable",
+      "name": "Get Transaction from Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "airtableApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env[\"SUPABASE_URL\"]}}/functions/v1/process-ablefy-webhook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env[\"SUPABASE_ANON_KEY\"]}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-webhook-secret",
+              "value": "={{$env[\"N8N_WEBHOOK_SECRET\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "trx_id",
+              "value": "={{$json[\"fields\"][\"trx_id\"]}}"
+            },
+            {
+              "name": "relevante_id",
+              "value": "={{$json[\"fields\"][\"relevante_id\"]}}"
+            },
+            {
+              "name": "rechnungsnummer",
+              "value": "={{$json[\"fields\"][\"rechnungsnummer\"]}}"
+            },
+            {
+              "name": "datum",
+              "value": "={{$json[\"fields\"][\"datum\"]}}"
+            },
+            {
+              "name": "erfolgt_am",
+              "value": "={{$json[\"fields\"][\"erfolgt_am\"]}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json[\"fields\"][\"status\"]}}"
+            },
+            {
+              "name": "typ",
+              "value": "={{$json[\"fields\"][\"typ\"]}}"
+            },
+            {
+              "name": "zahlungsart",
+              "value": "={{$json[\"fields\"][\"zahlungsart\"]}}"
+            },
+            {
+              "name": "order_number",
+              "value": "={{$json[\"fields\"][\"order_number\"]}}"
+            },
+            {
+              "name": "product_id",
+              "value": "={{$json[\"fields\"][\"product_id\"]}}"
+            },
+            {
+              "name": "produkt",
+              "value": "={{$json[\"fields\"][\"produkt\"]}}"
+            },
+            {
+              "name": "psp",
+              "value": "={{$json[\"fields\"][\"psp\"]}}"
+            },
+            {
+              "name": "faelliger_betrag",
+              "value": "={{$json[\"fields\"][\"faelliger_betrag\"]}}"
+            },
+            {
+              "name": "bezahlt",
+              "value": "={{$json[\"fields\"][\"bezahlt\"]}}"
+            },
+            {
+              "name": "bezahlt_minus_fee",
+              "value": "={{$json[\"fields\"][\"bezahlt_minus_fee\"]}}"
+            },
+            {
+              "name": "waehrung",
+              "value": "={{$json[\"fields\"][\"waehrung\"]}}"
+            },
+            {
+              "name": "fees_total",
+              "value": "={{$json[\"fields\"][\"fees_total\"]}}"
+            },
+            {
+              "name": "fees_service",
+              "value": "={{$json[\"fields\"][\"fees_service\"]}}"
+            },
+            {
+              "name": "fees_payment_provider",
+              "value": "={{$json[\"fields\"][\"fees_payment_provider\"]}}"
+            },
+            {
+              "name": "vat_rate",
+              "value": "={{$json[\"fields\"][\"vat_rate\"]}}"
+            },
+            {
+              "name": "ust",
+              "value": "={{$json[\"fields\"][\"ust\"]}}"
+            },
+            {
+              "name": "plan",
+              "value": "={{$json[\"fields\"][\"plan\"]}}"
+            },
+            {
+              "name": "zahlungsplan_id",
+              "value": "={{$json[\"fields\"][\"zahlungsplan_id\"]}}"
+            },
+            {
+              "name": "gutscheincode",
+              "value": "={{$json[\"fields\"][\"gutscheincode\"]}}"
+            },
+            {
+              "name": "vorname",
+              "value": "={{$json[\"fields\"][\"vorname\"]}}"
+            },
+            {
+              "name": "nachname",
+              "value": "={{$json[\"fields\"][\"nachname\"]}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$json[\"fields\"][\"email\"]}}"
+            },
+            {
+              "name": "telefon",
+              "value": "={{$json[\"fields\"][\"telefon\"]}}"
+            },
+            {
+              "name": "land",
+              "value": "={{$json[\"fields\"][\"land\"]}}"
+            },
+            {
+              "name": "stadt",
+              "value": "={{$json[\"fields\"][\"stadt\"]}}"
+            },
+            {
+              "name": "strasse",
+              "value": "={{$json[\"fields\"][\"strasse\"]}}"
+            },
+            {
+              "name": "hausnummer",
+              "value": "={{$json[\"fields\"][\"hausnummer\"]}}"
+            },
+            {
+              "name": "plz",
+              "value": "={{$json[\"fields\"][\"plz\"]}}"
+            },
+            {
+              "name": "ust_id",
+              "value": "={{$json[\"fields\"][\"ust_id\"]}}"
+            },
+            {
+              "name": "unternehmen",
+              "value": "={{$json[\"fields\"][\"unternehmen\"]}}"
+            },
+            {
+              "name": "account_type",
+              "value": "={{$json[\"fields\"][\"account_type\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "supabase",
+      "name": "Send to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$responseCode}}",
+              "value2": 200
+            }
+          ]
+        }
+      },
+      "id": "if",
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Transaction synced successfully"
+            }
+          ]
+        }
+      },
+      "id": "success",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "subject": "Ablefy Sync Error",
+        "message": "=Error syncing transaction {{$node[\"airtable\"].json[\"fields\"][\"trx_id\"]}}:\n\n{{$json[\"error\"]}}",
+        "toEmail": "admin@ozean-licht.com"
+      },
+      "id": "error-email",
+      "name": "Send Error Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1050, 400],
+      "credentials": {
+        "smtp": {
+          "id": "2",
+          "name": "SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "webhook": {
+      "main": [
+        [
+          {
+            "node": "airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "airtable": {
+      "main": [
+        [
+          {
+            "node": "supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "supabase": {
+      "main": [
+        [
+          {
+            "node": "if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if": {
+      "main": [
+        [
+          {
+            "node": "success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [],
+  "pinData": {},
+  "notes": "## Ablefy Transaction Sync Workflow\n\n### Setup:\n1. Configure Airtable webhook in Ablefy to trigger this workflow\n2. Set environment variables:\n   - SUPABASE_URL\n   - SUPABASE_ANON_KEY\n   - N8N_WEBHOOK_SECRET\n3. Configure SMTP credentials for error notifications\n\n### Flow:\n1. Webhook receives transaction update from Ablefy\n2. Fetch full transaction data from Airtable\n3. Send to Supabase Edge Function for processing\n4. Check response and send error notification if failed"
+}

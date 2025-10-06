@@ -9,7 +9,7 @@ interface Course {
   title: string
   description: string
   price: number
-  is_published: boolean
+  is_public: boolean
   thumbnail_url_desktop?: string
   thumbnail_url_mobile?: string
   course_code: number

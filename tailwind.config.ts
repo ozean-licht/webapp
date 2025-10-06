@@ -32,6 +32,7 @@ const config: Config = {
       fontFamily: {
         'cinzel': ['Cinzel', 'serif'],
         'cinzel-decorative': ['Cinzel Decorative', 'serif'],
+        'montserrat': ['Montserrat', 'sans-serif'],
         'montserrat-alt': ['Montserrat Alternates', 'sans-serif'],
       },
       backgroundImage: {

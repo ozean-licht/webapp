@@ -4,28 +4,31 @@ const axios = require('axios');
 
 async function testN8NConnection() {
   const n8nApiKey = process.env['N8N_API_KEY'] || process.env['X-N8N-API-KEY'];
-  const n8nUrl = process.env['N8N_URL'] || 'https://n8n.ozean-licht.com/api/v1';
+  const n8nUrl = process.env['N8N_URL'] || process.env['N8N_BASE_URL'] || 'https://n8n.ozean-licht.com';
 
   if (!n8nApiKey) {
     console.error('❌ Fehler: N8N_API_KEY oder X-N8N-API-KEY nicht in .env.local gefunden');
     console.log('📝 Verfügbare ENV-Variablen:', Object.keys(process.env).filter(key => key.includes('N8N')));
     return;
   }
-
+  
+  // Normalisiere URL (entferne trailing slash und /api/v1 falls vorhanden)
+  let baseUrl = n8nUrl.replace(/\/$/, '').replace(/\/api\/v1$/, '');
+  
   console.log('🔗 Teste N8N Verbindung...');
-  console.log(`🌐 Basis-URL: ${n8nUrl}`);
+  console.log(`🌐 Basis-URL: ${baseUrl}`);
   console.log(`🔑 API Key: ${n8nApiKey.substring(0, 10)}...`);
 
   // Verschiedene mögliche API-Endpunkte testen
   const endpoints = [
+    '/api/v1/workflows',
     '/rest/workflows',
     '/workflows',
-    '/api/workflows',
-    '/api/v1/workflows'
+    '/api/workflows'
   ];
 
   for (const endpoint of endpoints) {
-    const fullUrl = n8nUrl.endsWith('/') ? n8nUrl.slice(0, -1) + endpoint : n8nUrl + endpoint;
+    const fullUrl = baseUrl + endpoint;
     console.log(`\n🔍 Teste Endpunkt: ${endpoint}`);
 
     try {

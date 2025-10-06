@@ -21,7 +21,7 @@ export function BookPromo() {
           <div className="space-y-6">
             <SpanBadge icon="sparkle" text="Alles, was du nie wissen solltest" />
 
-            <h2 className="font-cinzel text-4xl md:text-5xl text-white leading-tight">Kosmische Codes</h2>
+            <h2 className="font-cinzel-decorative text-4xl md:text-5xl text-white leading-tight">Kosmische Codes</h2>
 
             <p className="text-gray-300 font-montserrat-alt text-lg leading-relaxed">
               Das ist nicht nur ein Buch ... und dieses Wissen sollte niemals geteilt werden. Ursprünglich durften die

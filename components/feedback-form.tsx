@@ -33,7 +33,7 @@ export default function FeedbackForm() {
 
   return (
     <div className="rounded-xl border bg-[#00151a] p-8" style={{ borderColor: "#052a2a" }}>
-      <h2 className="font-cinzel text-3xl text-white text-center mb-8">
+      <h2 className="font-cinzel-decorative text-3xl text-white text-center mb-8">
         Dein Feedback Ist Uns Wichtig
       </h2>
 

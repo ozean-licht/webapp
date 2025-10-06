@@ -77,7 +77,7 @@ export default function PartnerDealPage() {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <SpanDesign>Für deinen Seelenpartner</SpanDesign>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-cinzel text-white text-balance">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-cinzel-decorative text-white text-balance">
               Special Partner Deal
             </h1>
 
@@ -117,7 +117,7 @@ export default function PartnerDealPage() {
         <section className="w-full py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-cinzel text-white">Das Besondere an diesem Angebot</h2>
+              <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white">Das Besondere an diesem Angebot</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -164,7 +164,7 @@ export default function PartnerDealPage() {
         <section className="w-full py-16 px-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <SpanDesign>Schnell & Einfach</SpanDesign>
-            <h2 className="text-3xl md:text-4xl font-cinzel text-white">So funktioniert es</h2>
+            <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white">So funktioniert es</h2>
 
             <div className="space-y-6 max-w-2xl mx-auto">
               <div className="text-left bg-[#001212] p-6 rounded-lg border" style={{ borderColor: "#052a2a" }}>
@@ -173,7 +173,7 @@ export default function PartnerDealPage() {
                     <span className="text-white font-bold">1</span>
                   </div>
                   <div>
-                    <h3 className="text-white font-cinzel text-xl mb-2">Kontaktiere uns</h3>
+                    <h3 className="text-white font-cinzel-decorative text-xl mb-2">Kontaktiere uns</h3>
                     <p className="text-white/70 font-montserrat-alt">
                       Fülle das Formular weiter unten auf dieser Seite aus und wähle den Kurs aus, um den es geht.
                     </p>
@@ -187,7 +187,7 @@ export default function PartnerDealPage() {
                     <span className="text-white font-bold">2</span>
                   </div>
                   <div>
-                    <h3 className="text-white font-cinzel text-xl mb-2">Bearbeitung deiner Anfrage</h3>
+                    <h3 className="text-white font-cinzel-decorative text-xl mb-2">Bearbeitung deiner Anfrage</h3>
                     <p className="text-white/70 font-montserrat-alt">
                       Nach dem Senden des Formulars werden wir deine Anfrage innerhalb von 1-3 Tagen bearbeiten.
                     </p>
@@ -201,7 +201,7 @@ export default function PartnerDealPage() {
                     <span className="text-white font-bold">3</span>
                   </div>
                   <div>
-                    <h3 className="text-white font-cinzel text-xl mb-2">Rabatt-Gutschein für deinen Partner</h3>
+                    <h3 className="text-white font-cinzel-decorative text-xl mb-2">Rabatt-Gutschein für deinen Partner</h3>
                     <p className="text-white/70 font-montserrat-alt">
                       Dein Seelenpartner bekommt einen exklusiven Rabatt-Gutschein für den besagten Kurs per Mail zugeschickt.
                     </p>
@@ -217,7 +217,7 @@ export default function PartnerDealPage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <SpanDesign>Partner Deal Anfragen</SpanDesign>
-              <h2 className="text-3xl md:text-4xl font-cinzel text-white mt-8 mb-4">Deine Anfrage stellen</h2>
+              <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white mt-8 mb-4">Deine Anfrage stellen</h2>
               <p className="text-white/70 font-montserrat-alt text-lg">
                 Nimm zu uns Kontakt auf und lass uns zusammen die volle Intensität des Kurses für deinen Seelenpartner freischalten ♥
               </p>
@@ -228,7 +228,7 @@ export default function PartnerDealPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Your Information */}
                 <div className="space-y-4">
-                  <h3 className="text-white font-cinzel text-xl">Deine Informationen</h3>
+                  <h3 className="text-white font-cinzel-decorative text-xl">Deine Informationen</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="firstName" className="text-white font-montserrat-alt">Dein Vorname *</label>
@@ -273,7 +273,7 @@ export default function PartnerDealPage() {
 
                 {/* Partner Information */}
                 <div className="space-y-4">
-                  <h3 className="text-white font-cinzel text-xl">Informationen deines Partners</h3>
+                  <h3 className="text-white font-cinzel-decorative text-xl">Informationen deines Partners</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="partnerFirstName" className="text-white font-montserrat-alt">Partner Vorname *</label>

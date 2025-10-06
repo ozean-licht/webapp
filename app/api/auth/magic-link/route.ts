@@ -26,35 +26,11 @@ export async function POST(request: NextRequest) {
     console.log('🎯 Using redirect URL:', redirectUrl)
     console.log('🌐 Base URL from env:', baseUrl)
 
-    console.log('📤 Sending magic link via Supabase Auth...')
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    })
+    console.log('📤 Skipping Supabase Auth (using only Edge Function)...')
+    // Wir überspringen Supabase Auth und verwenden nur unsere Edge Function
+    // Das verhindert doppelte E-Mails und gibt uns Kontrolle über das Design
 
-    if (error) {
-      console.error('❌ Supabase Auth error:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        status: error.status,
-        name: error.name
-      })
-
-      return NextResponse.json(
-        {
-          error: error.message || 'Fehler beim Senden des Magic Links',
-          details: error
-        },
-        { status: 500 }
-      )
-    }
-
-    console.log('✅ Magic link request successful')
-    console.log('📊 Response data:', data)
-
-    // Jetzt rufen wir unsere Edge Function DIREKT auf
+    // Jetzt rufen wir unsere Edge Function DIREKT auf (das ist jetzt die einzige E-Mail)
     console.log('🔗 Calling Edge Function directly...')
 
     try {
@@ -85,13 +61,26 @@ export async function POST(request: NextRequest) {
 
       if (!functionResponse.ok) {
         console.error('❌ Edge Function call failed')
+        return NextResponse.json(
+          {
+            error: 'Fehler beim Senden der E-Mail',
+            details: functionResult
+          },
+          { status: 500 }
+        )
       } else {
         console.log('✅ Edge Function called successfully')
       }
 
     } catch (functionError) {
       console.error('💥 Error calling Edge Function:', functionError)
-      // Wir ignorieren diesen Fehler, da die Hauptfunktionalität (Supabase Auth) funktioniert
+      return NextResponse.json(
+        {
+          error: 'Interner Serverfehler beim E-Mail-Versand',
+          details: functionError.message
+        },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({

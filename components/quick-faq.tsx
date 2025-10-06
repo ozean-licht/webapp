@@ -41,7 +41,7 @@ export function QuickFaq() {
         {/* Header */}
         <div className="text-center mb-16">
           <SpanDesign>FAQ</SpanDesign>
-          <h2 className="font-cinzel text-4xl md:text-5xl text-white mb-6 mt-6">Hier Ein Paar Antworten</h2>
+          <h2 className="font-cinzel-decorative text-4xl md:text-5xl text-white mb-6 mt-6">Hier Ein Paar Antworten</h2>
           <p className="text-gray-300 font-montserrat-alt text-lg max-w-3xl mx-auto leading-relaxed">
             Du bist neu hier in meiner Energie und ich möchte dir ein helfen ein paar Fragen vorab zu beantworten,
             sodass du schnell deinen Weg findest der für dich stimmig ist.

@@ -25,10 +25,7 @@ export function RegisterForm() {
     setError("")
     setIsLoading(true)
 
-    // Simulate registration process
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       if (!fullName || !email || !password) {
         throw new Error("Bitte füllen Sie alle Felder aus.")
       }
@@ -37,10 +34,42 @@ export function RegisterForm() {
         throw new Error("Bitte akzeptieren Sie die Datenschutzerklärung.")
       }
 
-      // Here you would typically make an API call to register
-      console.log("Registration attempt:", { fullName, email, password, newsletterAccepted })
+      // Verwende Supabase Auth für echte Registrierung
+      const { createBrowserSupabaseClient } = await import("@/lib/supabase")
+      const supabase = createBrowserSupabaseClient()
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            newsletter_accepted: newsletterAccepted,
+          },
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data.user) {
+        // Erfolgreiche Registrierung - zeige Bestätigungsnachricht
+        setError("") // Clear any previous errors
+        // Die Bestätigungs-E-Mail wurde automatisch gesendet
+        alert("Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail für die Bestätigung.")
+        // Redirect zur Login-Seite
+        window.location.href = "/login"
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
+      console.error("Registration error:", err)
+      if (err.message?.includes("User already registered")) {
+        setError("Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich an.")
+      } else if (err.message?.includes("Password should be at least")) {
+        setError("Das Passwort muss mindestens 6 Zeichen lang sein.")
+      } else {
+        setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -158,7 +187,11 @@ export function RegisterForm() {
 
         <div className="text-center text-xs text-muted-foreground">
           Bereits ein Konto?{" "}
-          <Button variant="link" className="text-[#4A9B9F] hover:text-[#5BADB1] text-xs font-medium p-0 h-auto">
+          <Button
+            variant="link"
+            className="text-[#4A9B9F] hover:text-[#5BADB1] text-xs font-medium p-0 h-auto"
+            onClick={() => window.location.href = "/login"}
+          >
             Jetzt anmelden
           </Button>
         </div>

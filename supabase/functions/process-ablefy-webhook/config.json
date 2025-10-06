@@ -1,0 +1,6 @@
+{
+  "name": "process-ablefy-webhook",
+  "version": "1.0",
+  "description": "Verarbeitet Ablefy Webhook Events und synchronisiert Transaktionen",
+  "verify_jwt": false
+}

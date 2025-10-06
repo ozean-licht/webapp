@@ -17,7 +17,7 @@ interface Course {
   title: string;
   description: string;
   price: number;
-  is_published: boolean;
+  is_public: boolean;
   thumbnail_url_desktop?: string;
   thumbnail_url_mobile?: string;
   course_code: number;
@@ -33,7 +33,7 @@ interface Blog {
   excerpt: string;
   author: string;
   read_time_minutes: number;
-  is_published: boolean;
+  is_public: boolean;
   thumbnail_url_desktop?: string;
   thumbnail_url_mobile?: string;
   published_at: string;
@@ -165,7 +165,7 @@ async function getPartnerDealCourses(limit: number = 50): Promise<Course[]> {
   let query = supabase
     .from('courses')
     .select('*')
-    .eq('is_published', true)
+    .eq('is_public', true)
     .gte('price', 100)
     .lte('price', 1000)
     .order('price', { ascending: false })
@@ -208,7 +208,7 @@ async function getCourse(slug: string): Promise<Course | null> {
     .from('courses')
     .select('*')
     .eq('slug', slug)
-    .eq('is_published', true)
+    .eq('is_public', true)
     .single();
 
   if (error) {
@@ -271,7 +271,7 @@ async function getBlog(slug: string): Promise<Blog | null> {
     .from('blogs')
     .select('*')
     .eq('slug', slug)
-    .eq('is_published', true)
+    .eq('is_public', true)
     .single();
 
   if (error) {

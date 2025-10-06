@@ -7,19 +7,19 @@ import "./globals.css"
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "700"],
   variable: "--font-cinzel-decorative",
 })
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-montserrat",
 })
 
 const montserratAlternates = Montserrat_Alternates({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-montserrat-alternates",
 })
 

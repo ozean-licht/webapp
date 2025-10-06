@@ -16,7 +16,7 @@ export default function AboutLiaPage() {
           <div className="space-y-5">
             <SpanDesign>Über Mich</SpanDesign>
 
-            <h1 className="text-4xl md:text-6xl font-cinzel text-white leading-tight">
+            <h1 className="text-4xl md:text-6xl font-cinzel-decorative text-white leading-tight">
               Advanced Metaphysik,<br />
               ET Botschaft, Channeling &<br />
               Quanten-Transformation
@@ -42,7 +42,7 @@ export default function AboutLiaPage() {
           <div className="max-w-4xl mx-auto text-center text-lg text-[#C4C8D4] leading-relaxed space-y-6 mt-10">
 
             <div className="bg-[#001212]/50 border border-[#0E282E] rounded-lg p-8">
-              <h2 className="text-2xl font-cinzel text-white mb-6 text-center">Lia Lohmann - 22.07.2024</h2>
+              <h2 className="text-2xl font-cinzel-decorative text-white mb-6 text-center">Lia Lohmann - 22.07.2024</h2>
 
               <p className="mb-4">Ich bin Lia,</p>
 
@@ -62,7 +62,7 @@ export default function AboutLiaPage() {
             </div>
 
             <div className="bg-[#001212]/50 border border-[#0E282E] rounded-lg p-8">
-              <h3 className="text-xl font-cinzel text-white mb-6">Zu meinem Leben auf der Erde</h3>
+              <h3 className="text-xl font-cinzel-decorative text-white mb-6">Zu meinem Leben auf der Erde</h3>
 
               <p className="mb-4">Als Kind war ich schon immer anders, passte nicht wirklich in die Gesellschaft, Hinterfragte Gedanken und Gepflogenheiten und Menschen reagierten schon immer sehr besonders auf meine Gegenwart. Ich konnte telekinetisch Dinge bewegen, war Telepathisch, hochsensitiv und wusste, wenn Menschen krank waren oder etwas nicht stimmte. Ich habe schon immer alles hinterfragt, war mit den normalen Antworten die ich bekam, nie zufrieden und war immer auf der Suche nach MEHR. Ich spürte, dass die Welt, in der wir leben soviel mehr ist, wir alle so viel mehr sind als wir glauben oder gesagt bekommen das wir sind. Und so begann schon sehr früh meine Reise in die Spiritualität. Als Kind habe ich schon immer am liebsten meditiert, habe dem flüstern der Natur gelauscht und bin auf Bäume geklettert, mit einem Buch in der Hand, um dem Himmel näher zu sein. Am liebsten verbrachte ich meine Zeit in der Natur, mit Tieren und in der Ruhe, um dieses Leben auf der Erde verstehen zu lernen.</p>
 

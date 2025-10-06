@@ -26,7 +26,7 @@ export function KidsAscensionPromo() {
           <div className="space-y-6">
             {/* Removed the highest span-badge "Non-Profit Projekt" */}
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel text-white text-balance">Kids AscensioN</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel-decorative text-white text-balance">Kids AscensioN</h2>
 
             <p className="text-white/70 font-montserrat-alt text-lg">
               Entdecke, wie wir allen Kindern helfen, ihr volles Potenzial zu entfalten und ihr inneres Licht zum

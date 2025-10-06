@@ -22,7 +22,7 @@ export function LoveLetterPromo() {
           <div className="space-y-6">
             {/* Removed the highest span-badge "Kosmische Impluse" */}
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel text-white text-balance">Love Letter</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-cinzel-decorative text-white text-balance">Love Letter</h2>
 
             <p className="text-white/70 font-montserrat-alt text-lg">
               Möchtest du regelmäßig sanfte Wellen der Inspiration empfangen, die dein inneres Licht nähren? Unser Love

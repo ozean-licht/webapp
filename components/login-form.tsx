@@ -15,24 +15,72 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [resetEmailSent, setResetEmailSent] = useState(false)
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError("Bitte geben Sie Ihre E-Mail-Adresse ein, bevor Sie das Passwort zurücksetzen.")
+      return
+    }
+
+    setError("")
+    setIsLoading(true)
+
+    try {
+      const { createBrowserSupabaseClient } = await import("@/lib/supabase")
+      const supabase = createBrowserSupabaseClient()
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?type=password_reset`,
+      })
+
+      if (error) {
+        throw error
+      }
+
+      setResetEmailSent(true)
+    } catch (err) {
+      console.error("Password reset error:", err)
+      setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
-    // Simulate login process
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       if (!email || !password) {
         throw new Error("Bitte füllen Sie alle Felder aus.")
       }
 
-      // Here you would typically make an API call to authenticate
-      console.log("Login attempt:", { email, password })
+      // Verwende Supabase Auth für echte Anmeldung
+      const { createBrowserSupabaseClient } = await import("@/lib/supabase")
+      const supabase = createBrowserSupabaseClient()
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data.user) {
+        // Erfolgreiche Anmeldung - Redirect zur Dashboard-Seite
+        window.location.href = "/dashboard"
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
+      console.error("Login error:", err)
+      if (err.message?.includes("Invalid login credentials")) {
+        setError("Ungültige Anmeldedaten. Bitte überprüfen Sie E-Mail und Passwort.")
+      } else {
+        setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten.")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -111,15 +159,32 @@ export function LoginForm() {
           </Button>
         </form>
 
+        {resetEmailSent && (
+          <Alert className="border-green-500 bg-green-500/10">
+            <AlertDescription className="text-green-400">
+              Eine E-Mail zum Zurücksetzen Ihres Passworts wurde gesendet. Bitte überprüfen Sie Ihr Postfach.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="text-center">
-          <Button variant="link" className="text-[#4A9B9F] hover:text-[#5BADB1] text-sm font-medium">
+          <Button
+            variant="link"
+            className="text-[#4A9B9F] hover:text-[#5BADB1] text-sm font-medium"
+            onClick={handlePasswordReset}
+            disabled={isLoading}
+          >
             Passwort vergessen?
           </Button>
         </div>
 
         <div className="text-center text-xs text-muted-foreground">
           Noch kein Konto?{" "}
-          <Button variant="link" className="text-[#4A9B9F] hover:text-[#5BADB1] text-xs font-medium p-0 h-auto">
+          <Button
+            variant="link"
+            className="text-[#4A9B9F] hover:text-[#5BADB1] text-xs font-medium p-0 h-auto"
+            onClick={() => window.location.href = "/register"}
+          >
             Jetzt registrieren
           </Button>
         </div>

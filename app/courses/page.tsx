@@ -10,7 +10,7 @@ interface Course {
   title: string
   description: string
   price: number
-  is_published: boolean
+  is_public: boolean
   thumbnail_url_desktop?: string
   thumbnail_url_mobile?: string
   course_code: number
@@ -48,7 +48,7 @@ export default async function CoursesPage() {
           <div className="space-y-5 mb-16">
             <SpanDesign>Unsere Kurse</SpanDesign>
 
-            <h1 className="text-4xl md:text-6xl font-cinzel text-white leading-tight">
+            <h1 className="text-4xl md:text-6xl font-cinzel-decorative text-white leading-tight">
               Entdecke unsere<br />
               Weiterbildungskurse
             </h1>

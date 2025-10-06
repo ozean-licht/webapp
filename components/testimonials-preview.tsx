@@ -28,7 +28,7 @@ export default function TestimonialsPreview() {
           <div className="space-y-8">
             <SpanBadge icon="feedback" text="Feedback" />
 
-            <h2 className="font-cinzel text-4xl md:text-5xl text-white leading-tight">
+            <h2 className="font-cinzel-decorative text-4xl md:text-5xl text-white leading-tight">
               Das Sagen Unsere
               <br />
               Soulmember

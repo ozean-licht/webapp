@@ -56,9 +56,10 @@ export function Ticker({
     )
   }
 
-  // Use enough images for smooth infinite scrolling
-  const totalImages = images.length * 20 // 20 sets for smooth looping
-  const containerWidth = "2000%" // 20 duplications = 2000% width
+  // Optimized: Use only 3 duplications for smooth infinite scrolling
+  // CSS animation handles the looping, we don't need 20x DOM duplication!
+  const totalImages = images.length * 3 // 3 sets is enough for seamless loop
+  const containerWidth = "300%" // 3 duplications = 300% width
 
   // Calculate animation duration based on speed
   const getDuration = (speed: string) => {
@@ -82,16 +83,20 @@ export function Ticker({
           animation: `${animationName} ${duration} linear infinite`,
         }}
       >
-        {/* Render enough images to fill viewport and create seamless loop */}
+        {/* Render optimized image count for seamless loop */}
         {Array.from({ length: totalImages }, (_, index) => {
           const imageIndex = index % images.length
           return (
-            <div key={`image-${index}`} className="flex-shrink-0 w-64 h-40">
+            <div 
+              key={`${imageAlt}-${imageIndex}-${index}`} 
+              className="flex-shrink-0 w-64 h-40"
+            >
               <div className="w-full h-full p-2 rounded-xl border border-border" style={{ backgroundColor: "#00151A" }}>
                 <img
                   src={images[imageIndex] || "/placeholder.svg"}
                   alt={`${imageAlt} ${imageIndex + 1}`}
                   className="w-full h-full object-cover rounded-lg"
+                  loading="lazy"
                 />
               </div>
             </div>

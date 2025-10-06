@@ -11,7 +11,7 @@ export function PartnerDealPromo() {
           <SpanDesign>Für deinen Seelenpartner</SpanDesign>
         </div>
 
-        <h2 className="font-cinzel text-4xl md:text-5xl text-white mb-6">Partner Special Deal</h2>
+        <h2 className="font-cinzel-decorative text-4xl md:text-5xl text-white mb-6">Partner Special Deal</h2>
 
         <p className="text-gray-300 text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
           Du hast eine/n Partner/in mit dem du die Kurse teilen möchtest?

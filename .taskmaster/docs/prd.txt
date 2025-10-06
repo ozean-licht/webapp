@@ -1,0 +1,587 @@
+# Product Requirements Document (PRD)
+## Ozean Licht Akademie™ - NextJS WebApp Entwicklung
+
+**Version:** 1.0  
+**Datum:** 06. Oktober 2025  
+**Projekttyp:** Spirituelle E-Learning & Community Plattform  
+**Tech Stack:** Next.js 14+, React, TypeScript, Tailwind CSS  
+
+---
+
+## 1. EXECUTIVE SUMMARY
+
+### 1.1 Projektvision
+Ozean Licht Akademie™ ist eine multidimensionale spirituelle Bildungsplattform, die Menschen dabei unterstützt, ihr kosmisches Selbst zu erwecken. Die WebApp dient als energetischer "Safe Space" für Transformation, Bewusstseinsarbeit und spirituelles Wachstum durch authentisches Wissen aus erster Hand.
+
+### 1.2 Kernmission
+- Menschen bei der Erinnerung ihrer kosmischen Natur unterstützen
+- Transformation limitierender Glaubenssätze durch LCQ® (Light Code Quantum Transformation)
+- Aufbau einer herzbasierten Community für bewusste Schöpfer
+- Integration von Bewusstsein und Verkörperung im Alltag
+- Bereitstellung von präzisen Werkzeugen zur Navigation der Realitätsmatrix
+
+### 1.3 Geschäftsmodell
+- **Freemium Model:** Kostenlose Basisinhalte + Premium Kurse
+- **Kursangebote:** Basis-, Aufbau- und Masterkurse
+- **Live Events:** Channelings, Q&As, Transformationssitzungen
+- **Community Membership:** Athemirah® Cosmic School
+- **Flexible Preisgestaltung:** Soziale Komponente für finanzielle Härtefälle
+
+---
+
+## 2. MARKT- & ZIELGRUPPENANALYSE
+
+### 2.1 Primäre Zielgruppen
+1. **Spirituell Erwachende (25-55 Jahre)**
+   - Suchen nach authentischem spirituellen Wissen
+   - Offen für multidimensionale Konzepte
+   - Interesse an ET-Kontakt und kosmischem Bewusstsein
+
+2. **New Age Kritiker**
+   - Desillusioniert von oberflächlicher Spiritualität
+   - Suchen nach tieferen, evidenzbasierten Ansätzen
+   - Wünschen direkte Erfahrungen statt Dogmen
+
+3. **Persönlichkeitsentwickler**
+   - Fokus auf Transformation und Selbstoptimierung
+   - Interesse an energetischer Heilung
+   - Wunsch nach praktischen Tools für Alltag
+
+4. **Eltern & Pädagogen**
+   - Interessiert am Kids Ascension Projekt (eigene Entity)
+   - Neue Bildungsparadigmen für Kinder
+
+### 2.2 Unique Selling Propositions (USPs)
+1. **Authentisches Wissen aus erster Hand** - Keine Theorie, sondern direkte ET-Kontakte
+2. **LCQ® Technologie** - Exklusive Light Code Quantum Transformation
+3. **Herzportal-Methodik** - Herzbasierte Bewusstseinsarbeit
+4. **Safe Space Philosophie** - Geschützter Raum ohne Dogmen
+5. **Integration statt Flucht** - Verkörperung im physischen Leben
+6. **Community Support** - Energetisches Support Grid bei allen Events
+
+---
+
+## 3. TECHNISCHE ARCHITEKTUR
+
+### 3.1 Frontend Stack
+```
+- Next.js 14+ (App Router)
+- React 18+ mit Server Components
+- TypeScript (strict mode)
+- Tailwind CSS + Custom Design System
+- Framer Motion (Animationen für "energetische" UX)
+- Zustand/Jotai (State Management)
+```
+
+### 3.2 Backend & Services
+```
+- Next.js API Routes / Server Actions
+- Supabase / Firebase (Auth, Database, Storage)
+- Stripe (Payments & Subscriptions)
+- Vimeo (Video Hosting & Streaming)
+- Resend (Transactional Emails)
+- Vercel (Hosting & Deployment)
+- Airtable (Prototyp SSoT -> aktuell befüllt mit +30 tables) - jedoch bald redundant, da 100% Supabase DB skalierbarer ist
+```
+
+### 3.3 Datenbank Schema (Vereinfacht)
+```typescript
+missing schema
+```
+
+---
+
+## 4. FEATURE BREAKDOWN
+
+### 4.1 CORE FEATURES (MVP - Phase 1)
+
+#### 4.1.1 Homepage & Landing
+**Requirements:**
+- Hero Section mit energetischem Wasser-Hintergrund (animated)
+- Value Proposition: "Erwecke dein kosmisches Selbst"
+- Mission Statement Display
+- Feature Showcase (3-4 Hauptbereiche)
+- Social Proof: Testimonials mit 95%+ Zufriedenheitsrate
+- Newsletter Signup mit Lightcode-Aktivierung
+- FAQ Accordion für Erstbesucher
+
+**Design Notes:**
+- Ozean/Wasser-Ästhetik durchgehend
+- Sanfte Türkis-Verläufe auf dunklem Hintergrund
+- Vortex/Energie-Visualisierungen
+- Responsive mit Mobile-First Approach
+
+#### 4.1.2 Kurskatalog & Kategorisierung
+**Kategorien:**
+1. **Aktuelle Events** (Live & Upcoming)
+2. **Aufzeichnungen & Basis Kurse**
+3. **Community Q&A** (Kostenlos)
+4. **Light Code Quantum & Gruppen Channelings**
+5. **Aufbaukurse**
+6. **Masterkurse**
+7. **Athemirah® Cosmic School** (Flagship)
+
+**Features pro Kurs:**
+- Thumbnail mit energetischer Signatur
+- Titel, Beschreibung, Dauer, Level
+- Preis oder "Kostenlos" Badge
+- Instructor Info (Lia Lohmann)
+- Vorschau-Video (Teaser)
+- Lernziele & Outcomes
+- Energetische Vorbereitung Guidelines
+- "Support Grid" Indikator
+
+**Filter & Suche:**
+- Nach Kategorie, Preis, Level
+- Freitext-Suche
+- Tag-basiert (Bewusstsein, Heilung, ET-Kontakt, etc.)
+- Sortierung: Neueste, Beliebteste, Preis
+
+#### 4.1.3 Video-Bibliothek (Streaming Platform)
+**Basierend auf Sitemap-Analyse: 95+ Videos**
+
+**Kategorien:**
+- Grundlagen (Herzportal, Quantenfeld, Seele)
+- Transformation (LCQ Sessions, DNA-Aktivierung)
+- Kosmisches Wissen (ET-Kontakt, Matrix, Lemuria)
+- Channelings (St. Germain, Arcturian, Metatron)
+- Interviews & Stories (Lia's Vita, Expertengespräche)
+- Meditationen & Soundhealing
+
+**Video Player Features:**
+- Custom Player mit Lightcode-Marker (Timeline)
+- Transkript-Anzeige (Optional)
+- Playback Speed Control
+- Bookmark/Save Funktion
+- Kommentarsektion mit Energieaustausch
+- Related Videos Empfehlungen
+- Download für Offline (Premium)
+
+**Performance:**
+- Progressive Loading
+- Adaptive Bitrate Streaming
+- Mobile-optimiert
+- Analytics für Viewing Behavior
+
+#### 4.1.4 User Authentication & Profiles
+**Auth Flows:**
+- Email/Password Sign-up
+- Social Login (Google, Apple)
+- Magic Link Authentication
+- 2FA Optional
+
+**User Profile:**
+- Persönliche Daten
+- Mitgliedsnummer
+- Kursfortschritte & Zertifikate
+- Buchungshistorie
+- Gespeicherte Inhalte
+- Community Beiträge
+- Persönliche Notizen zu Videos/Kursen
+
+**Subscription Tiers:**
+- **Free:** Zugang zu kostenlosen Inhalten (Videothek), Community Q&As
+- **Seeker (€18/Monat):** Zugang zu Basiskursen + Gruppen Channelings
+- **Angel (€38/Monat):** Kids Ascension Spender +20€ -> Bekommen unterschiedliche Gifts pro Monat
+
+#### 4.1.5 Zahlungssystem
+**Stripe Integration:**
+- One-time Payments (Einzelkurse)
+- Recurring Subscriptions
+- Partner Deal Special (2-for-1 Angebote)
+- Flexible Pricing Options (Ratenzahlung)
+- Invoice Generation
+- Payment History
+- Refund Management
+
+**Pricing Flexibility:**
+- "Ehrliche Preisgestaltung" - User kann finanzielle Situation mitteilen
+- Admin kann Custom Discounts vergeben
+- Sliding Scale für finanziell Schwache
+
+#### 4.1.6 Live Event System
+**Event Types:**
+- Live Channelings (Zoom Integration)
+- Q&A Sessions
+- LCQ Transformations
+- Grid Work Calls
+- Athemirah School Sessions
+
+**Features:**
+- Event Calendar (Countdown Timer)
+- Booking & Registration
+- Zoom/Stream Integration
+- Live Chat während Event
+- Automatic Recording & Upload
+- Post-Event Aufzeichnung verfügbar
+- Reminder Notifications (Email, Push)
+
+**Capacity Management:**
+- Max Teilnehmerzahl
+- Warteliste Funktion
+- Early Bird Preise
+
+---
+
+### 4.2 ADVANCED FEATURES (Phase 2)
+
+#### 4.2.1 Athemirah® Cosmic School Integration
+**Dedicated Section:**
+- Jahr 1 & Jahr 2 Inhalte
+- Monatliche Module (12 pro Jahr)
+- Schulstunden-Archiv
+- Assignments & Übungen
+- Community Forum für Teilnehmer
+- Zertifizierung nach Abschluss
+
+**Special Features:**
+- "Crystal Archive" Navigation
+- Feedbacks & Testimonials Dyanmik Section per Course
+- Energetic Support Grid Visualisierung
+- Personalisierter Lernpfad
+
+#### 4.2.2 Licht Navigator
+**AI Chat Assistant:**
+- Recommended Courses/Videos
+- Regex Query System
+- DB Knowledge Base 
+- Smart Features
+- Voice Agent / Hotline (for Later)
+
+#### 4.2.3 Magazin & Blog
+**Content Types:**
+- Updates & Announcements
+- Community Love Letters
+- Educational Articles
+- Energie Updates
+- Interview Transkripte
+
+**Features:**
+- Rich Text Editor (Admin)
+- SEO-optimiert
+- Social Sharing
+- Kommentare
+- Tag-basierte Navigation
+- Featured Posts
+
+#### 4.2.4 Community Features
+**Forum/Discussion:**
+- Topic-basierte Threads
+- Energieaustausch (Like-System mit Heart ❤)
+- Moderations-Tools
+- Private Messaging
+- User Reputation System
+- "Ozean Perlen" (Community Members) Showcase
+
+#### 4.2.5 Personalisierungs-Engine
+**AI-Powered Recommendations:**
+- Basierend auf Energy Profile
+- Viewing History Analysis
+- Learning Path Suggestions
+- Custom Playlists
+- Email Digest mit personalisierten Inhalten
+
+#### 4.2.6 Download & Offline Access
+**Premium Feature:**
+- Video Downloads
+- Audio-only Exports
+- PDF Workbooks
+- Meditation Guides
+- Offline Mode in Mobile App
+
+---
+
+### 4.3 ADMIN & CMS FEATURES
+
+#### 4.3.1 Content Management System
+**Course Builder:**
+- Drag & Drop Modul-Erstellung
+- Rich Text Editor
+- Video Upload & Management
+- Lightcode Timestamp Marker
+- Preview Mode
+- Publishing Workflow
+
+**User Management:**
+- User Search & Filter
+- Subscription Management
+- Access Control
+- Manual Enrollment
+- Custom Discount Codes
+- Communication Tools
+
+**Analytics Dashboard:**
+- User Growth Metrics
+- Revenue Analytics
+- Course Performance
+- Video Engagement Stats
+- Conversion Funnels
+- Retention Rates
+
+#### 4.3.2 Event Management
+- Calendar Management
+- Zoom Link Generation
+- Capacity Monitoring
+- Attendee List Export
+- Post-Event Upload
+- Automated Communications
+
+#### 4.3.3 Financial Reporting
+- Revenue Dashboard
+- Subscription MRR/ARR
+- Payout Tracking
+- Tax Documentation
+- Refund Management
+
+---
+
+## 5. USER EXPERIENCE (UX) DESIGN
+
+### 5.1 Design Prinzipien
+1. **Energetische Ästhetik:** Fließende Animationen, Wasser-/Ozean-Metaphern
+2. **Safe Space Feeling:** Warme Farben, beruhigende Typografie
+3. **Intuitive Navigation:** Maximal 3 Klicks zu jedem Inhalt
+4. **Mobile-First:** 60%+ User auf Mobile erwartet
+5. **Accessibility:** WCAG 2.1 AA Konformität
+6. **Performance:** <2s Initial Load Time
+
+
+### 5.2 Wireframe Prioritäten
+1. **Homepage:** Above-the-fold mit Mission + CTA
+2. **Kurskatalog:** Grid Layout mit Filtern
+3. **Kursdetailseite:** Hero + Modules + Testimonials + CTA
+4. **Video Player:** Fullscreen fähig, Lightcode Markers
+5. **Event Calendar:** Monatliche + Listenansicht
+6. **User Dashboard:** Progress Tracking + Recommendations
+7. **Checkout:** Single-page mit Trust Signals
+
+---
+
+## 6. CONTENT STRATEGIE
+
+### 6.1 Bestehender Content (Sitemap-Analyse)
+
+**Hauptseiten:**
+- Homepage (/)
+- Athemirah School (/athemirah-school)
+- Kurse (/kurse)
+- Videos (/videos) - **95+ Videos**
+- Magazin (/magazin) - **3 Artikel**
+- Über Lia (/ueber-lia)
+- Kontakt (/kontakt)
+- Partner Deal (/partner-deal)
+- Feedback (/feedback)
+- Kooperationen (/kooperationen)
+- Berufung & Bewerben (/berufung, /bewerben)
+
+**Legal Pages:**
+- Datenschutz (/datenschutz)
+- Impressum (/impressum)
+- Teilnahmebedingungen (/teilnahmebedingungen)
+- Vereinsstatuten (/vereinsstatuten)
+- Registerauszug (/registerauszug)
+
+### 6.2 Content Migration Plan
+1. **Phase 1:** Alle 95 Videos mit Metadaten importieren
+2. **Phase 2:** Magazin-Artikel übertragen
+3. **Phase 3:** Kurs-Strukturen aufbauen
+4. **Phase 4:** Athemirah School Content organisieren
+5. **Phase 5:** Legal Pages aktualisieren
+
+### 6.3 SEO Strategie
+**Target Keywords:**
+- "Spirituelle Weiterbildung"
+- "Kosmisches Bewusstsein"
+- "Herzbasierte Meditation"
+- "Light Code Transformation"
+- "Athemirah School"
+- "Lia Lohmann Kurse"
+
+**On-Page SEO:**
+- Semantisches HTML
+- Meta Descriptions pro Seite
+- Open Graph Tags
+- Schema.org Markup (Course, Event, Person)
+- Alt-Texte für alle Bilder
+- Internal Linking Strategie
+
+---
+
+## 7. TECHNISCHE REQUIREMENTS
+
+### 7.1 Performance Benchmarks
+- **Lighthouse Score:** >90 in allen Kategorien
+- **First Contentful Paint:** <1.5s
+- **Time to Interactive:** <3s
+- **Core Web Vitals:** Alle "Good"
+- **Video Start Time:** <2s
+
+### 7.2 Security Requirements
+- HTTPS Everywhere
+- GDPR Compliance (EU-basierte User)
+- Data Encryption at Rest
+- Secure Payment Processing (PCI-DSS)
+- Rate Limiting auf APIs
+- CSRF Protection
+- XSS Prevention
+- SQL Injection Prevention
+
+### 7.3 Scalability
+- **Current Expected Load:** 10000 concurrent users
+- **Growth Projection:** 100,000+ users in 12 months
+- **Video Bandwidth:** CDN mit Global Edge Locations
+- **Database:** Horizontal Scaling Ready
+- **Caching Strategy:** Redis für Sessions, ISR für Static Pages
+
+### 7.4 Browser Support
+- Chrome/Edge (last 2 versions)
+- Firefox (last 2 versions)
+- Safari (last 2 versions)
+- Mobile Safari (iOS 14+)
+- Chrome Mobile (Android 10+)
+
+### 7.5 Monitoring & Logging
+- **Error Tracking:** Sentry
+- **Analytics:** Google Analytics 4 + Plausible (GDPR-friendly)
+- **Performance Monitoring:** Vercel Analytics
+- **Uptime Monitoring:** UptimeRobot
+- **Log Aggregation:** Vercel Logs / CloudWatch
+
+---
+
+## 8. INTEGRATIONS
+
+### 8.1 Third-Party Services
+1. **Zoom API** - Live Events & Webinare
+2. **Stripe** - Payments & Subscriptions
+3. **Vimeo/Mux** - Video Hosting
+4. **Resend** - Transactional Emails
+5. **GetResponse** - Loveletter (Newsletter)
+7. **Telegram Bot** (Optional) - Community Notifications
+
+### 8.2 Email Automation Workflows
+1. **Welcome Series:** 7-Email Onboarding
+2. **Course Launch:** Announcement Emails
+3. **Event Reminders:** 7d, 1d, 1h before
+4. **Abandoned Cart:** 24h, 72h follow-up
+5. **Re-engagement:** 30d inactive users
+6. **Milestone Celebrations:** Kursabschluss, Jahrestag
+
+---
+
+## 9. ENTWICKLUNGS-ROADMAP
+
+### Phase 1: MVP
+
+**Woche 1-2: Setup & Foundation**
+- Next.js Projekt Setup
+- Design System in Tailwind
+- Supabase/Firebase Setup
+- CI/CD Pipeline (Vercel)
+
+**Woche 3-4: Core Pages**
+- Homepage
+- Kurskatalog
+- Kursdetailseiten
+- User Auth Flows
+
+**Woche 5-6: Video Platform**
+- Videothek UI
+- Video Player Integration
+- Video Metadata Management
+- Search & Filter
+
+**Woche 7-8: Payment System**
+- Stripe Integration
+- Checkout Flows
+- Subscription Management
+- Invoicing
+
+**Woche 9-10: User Dashboard**
+- Profile Management
+- Progress Tracking
+- Enrollment Management
+- Settings
+
+**Woche 11-12: Testing & Launch**
+- QA Testing
+- Performance Optimization
+- Content Migration
+- Soft Launch
+
+### Phase 2: Advanced Features
+- Athemirah School Integration
+- Live Event System
+- Magazin/Blog CMS
+- Community Forum
+- Mobile Optimization
+- Analytics Setup
+
+### Phase 3: Growth Features
+- Mobile App (React Native/Flutter)
+- Advanced Personalization
+- Affiliate / Referal Coupon System
+- Multi-language Support (EN, DE)
+- API für Third-Party Integrations
+
+### Phase 4: Scale & Optimize
+- Performance Audits
+- A/B Testing Framework
+- Advanced SEO
+- Marketing Automation
+- User Interviews & Iteration
+- Version 2.0 Planning
+
+
+## 12. APPENDIX
+
+### 12.1 Glossar
+- **LCQ®:** Light Code Quantum Transformation - Proprietary Methode
+- **Herzportal:** Herzbasiertes Bewusstseins-Tool
+- **Athemirah School:** Flagship Education Program
+- **Safe Space:** Geschützter energetischer Raum
+- **Grid Work:** Kollektive energetische Arbeit
+- **Ascension:** Spirituelles Erwachen/Aufstieg
+
+### 12.2 Konkurrenzanalyse
+**Direkte Wettbewerber:**
+- Gaia.com (US, breites spirituelles Spektrum)
+- MindValley (Persönlichkeitsentwicklung)
+- Hay House (Bücher + Kurse)
+
+**Ozean Licht Differenzierung:**
+- Authentische ET-Kontakt Erfahrungen
+- Deutsche Sprache & Kultur
+- Herzbasierte statt kopflastige Methodik
+- Keine Dogmen, individuelle Freiheit
+- Community-getrieben
+
+### 12.3 Technologie-Stack Details
+```yaml
+Frontend:
+  - Next.js 14.2.0+
+  - React 18.3.0+
+  - TypeScript 5.0+
+  - Tailwind CSS 3.4+
+  - Framer Motion 11+
+
+Backend:
+  - Next.js API Routes
+  - Supabase (PostgreSQL)
+  - Supabase Auth
+  - Supabase Storage
+  - N8N (selfhosted)
+
+Services:
+  - Vercel (Hosting)
+  - Stripe (Payments)
+  - Vimeo (Video)
+  - Resend (Email)
+  - Google (Analytics)
+
+Development:
+  - Git/GitHub
+  - ESLint + Prettier
+  - Docker MCP Gateway
+  - Storybook (Component Dev)
+```

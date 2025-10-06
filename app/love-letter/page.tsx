@@ -53,7 +53,7 @@ export default function LoveLetterPage() {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <SpanDesign>Eine Stimme der Gemeinschaft</SpanDesign>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-cinzel text-white text-balance">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-cinzel-decorative text-white text-balance">
               Love Letter
             </h1>
 
@@ -93,7 +93,7 @@ export default function LoveLetterPage() {
         <section className="w-full py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-cinzel text-white">Was erreicht dich im Love Letter?</h2>
+              <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white">Was erreicht dich im Love Letter?</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -139,7 +139,7 @@ export default function LoveLetterPage() {
         {/* Contribution Topics Section */}
         <section className="w-full py-16 px-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <h2 className="text-3xl md:text-4xl font-cinzel text-white">Dein Beitrag kann diese Bereiche berühren</h2>
+            <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white">Dein Beitrag kann diese Bereiche berühren</h2>
 
             {/* FAQ Style for Topics */}
             <div className="space-y-4 max-w-2xl mx-auto">
@@ -186,7 +186,7 @@ export default function LoveLetterPage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <SpanDesign>Beitrag Einreichen</SpanDesign>
-              <h2 className="text-3xl md:text-4xl font-cinzel text-white mt-8 mb-4">Deinen Beitrag Senden</h2>
+              <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white mt-8 mb-4">Deinen Beitrag Senden</h2>
               <p className="text-white/70 font-montserrat-alt text-lg">
                 Wir laden dich herzlich ein, jederzeit deinen persönlichen Beitrag für unseren Love Letter einzureichen.
                 Aus allen Einsendungen wählen wir achtsam jene aus, die den Geist unseres Love Letters am besten verkörpern.

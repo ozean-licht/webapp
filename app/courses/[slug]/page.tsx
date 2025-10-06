@@ -191,7 +191,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <SpanDesign>Was du lernst</SpanDesign>
-            <h2 className="text-3xl md:text-4xl font-cinzel text-white mt-6">
+            <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white mt-6">
               Kursinhalt & Struktur
             </h2>
           </div>
@@ -228,7 +228,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <SpanDesign>Erfahrungen</SpanDesign>
-            <h2 className="text-3xl md:text-4xl font-cinzel text-white mt-6">
+            <h2 className="text-3xl md:text-4xl font-cinzel-decorative text-white mt-6">
               Was unsere Teilnehmer sagen
             </h2>
           </div>
