@@ -17,7 +17,7 @@ if (!hookSecret) {
 const resend = new Resend(resendApiKey);
 
 serve(async (req) => {
-  console.log('🚀🚀🚀 EDGE FUNCTION CALLED - VERSION 31 🚀🚀🚀');
+  console.log('🚀🚀🚀 EDGE FUNCTION CALLED - VERSION 32 (Real Magic Link) 🚀🚀🚀');
   console.log('📡 Method:', req.method);
   console.log('🔗 URL:', req.url);
 
@@ -30,17 +30,19 @@ serve(async (req) => {
     try {
       data = JSON.parse(payload);
       console.log('📧 Email from payload:', data.email);
+      console.log('🔗 Magic Link from payload:', data.magicLink ? 'Present ✅' : 'Missing ❌');
       console.log('🔗 Redirect from payload:', data.redirectTo);
       console.log('📍 Source:', data.source);
     } catch (e) {
       console.log('❌ Could not parse JSON payload');
     }
 
-    if (data?.email) {
-      console.log('📧 ===== SENDING CUSTOM EMAIL =====');
+    if (data?.email && data?.magicLink) {
+      console.log('📧 ===== SENDING CUSTOM EMAIL WITH REAL MAGIC LINK =====');
 
       try {
-        const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://suwevnhwtmcazjugfmps.supabase.co';
+        // Verwende den ECHTEN Magic Link von Supabase Admin API
+        const magicLink = data.magicLink;
 
         // Import the email template with logo and Cinzel Decorative
         const emailHtml = `
@@ -66,7 +68,7 @@ serve(async (req) => {
                   Klicke einfach auf den Button unten, um dich automatisch anzumelden.
                 </p>
                 <div style="margin: 40px 0;">
-                  <a href="${supabaseUrl}/auth/v1/verify?token=demo&email=${encodeURIComponent(data.email)}&type=magiclink&redirect_to=${encodeURIComponent(data.redirectTo || `${supabaseUrl}/auth/callback`)}"
+                  <a href="${magicLink}"
                      style="background: linear-gradient(135deg, #188689 0%, #20a8a3 100%); color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px rgba(24, 134, 137, 0.4); transition: all 0.3s ease;">
                     🔐 Mit Magic Link anmelden
                   </a>
@@ -131,7 +133,7 @@ serve(async (req) => {
       timestamp: new Date().toISOString(),
       method: req.method,
       hasPayload: !!payload,
-      version: '31'
+      version: '32'
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

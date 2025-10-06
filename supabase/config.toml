@@ -1,6 +1,6 @@
 
 [functions.send-email]
-enabled = false
+enabled = true
 verify_jwt = false
 import_map = "./functions/send-email/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
