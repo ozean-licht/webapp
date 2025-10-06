@@ -20,44 +20,92 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('🔐 Auth Callback: Starting...')
+        console.log('🔗 Full URL:', window.location.href)
+        console.log('🔗 Hash:', window.location.hash)
+        console.log('🔗 Search:', window.location.search)
+
+        const supabase = createBrowserSupabaseClient()
+
         // Überprüfe URL-Parameter für verschiedene Auth-Typen
         const urlParams = new URLSearchParams(window.location.search)
         const urlAuthType = urlParams.get('type')
-        setAuthType(urlAuthType)
+        
+        // Check hash für Magic Link tokens
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const accessToken = hashParams.get('access_token')
+        const refreshToken = hashParams.get('refresh_token')
+        const hashAuthType = hashParams.get('type')
 
-        const supabase = createBrowserSupabaseClient()
+        console.log('📍 Auth Type from Query:', urlAuthType)
+        console.log('📍 Auth Type from Hash:', hashAuthType)
+        console.log('🔑 Access Token present:', !!accessToken)
+        console.log('🔑 Refresh Token present:', !!refreshToken)
+
+        setAuthType(urlAuthType || hashAuthType)
 
         if (urlAuthType === 'password_reset') {
           // Handle password reset
           setStatus('success')
           setMessage('Du kannst jetzt dein Passwort zurücksetzen.')
-          // Der User bleibt auf dieser Seite für das Passwort-Reset
           return
         }
 
+        // Wenn Tokens im Hash sind (Magic Link), setze die Session explizit
+        if (accessToken && refreshToken) {
+          console.log('✨ Setting session from hash tokens...')
+          
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+
+          if (sessionError) {
+            console.error('❌ Error setting session:', sessionError)
+            setStatus('error')
+            setMessage('Fehler beim Setzen der Session: ' + sessionError.message)
+            return
+          }
+
+          if (sessionData.session) {
+            console.log('✅ Session set successfully:', sessionData.session.user.email)
+            setStatus('success')
+            setMessage('Erfolgreich angemeldet! Du wirst weitergeleitet...')
+
+            // Redirect to dashboard after a short delay
+            setTimeout(() => {
+              router.push('/dashboard')
+            }, 1500)
+            return
+          }
+        }
+
+        // Fallback: Prüfe ob bereits eine Session existiert
+        console.log('🔍 Checking existing session...')
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {
-          console.error('Auth callback error:', error)
+          console.error('❌ Auth callback error:', error)
           setStatus('error')
           setMessage('Fehler bei der Authentifizierung. Bitte versuche es erneut.')
           return
         }
 
         if (data.session) {
+          console.log('✅ Existing session found:', data.session.user.email)
           setStatus('success')
           setMessage('Erfolgreich angemeldet! Du wirst weitergeleitet...')
 
-          // Redirect to dashboard or home page after a short delay
           setTimeout(() => {
             router.push('/dashboard')
-          }, 2000)
+          }, 1500)
         } else {
+          console.log('❌ No session found')
           setStatus('error')
           setMessage('Keine gültige Session gefunden. Bitte versuche es erneut.')
         }
       } catch (error) {
-        console.error('Callback error:', error)
+        console.error('💥 Callback error:', error)
         setStatus('error')
         setMessage('Ein unerwarteter Fehler ist aufgetreten.')
       }
