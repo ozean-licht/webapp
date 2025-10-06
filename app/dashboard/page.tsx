@@ -2,731 +2,558 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { AppLayout } from "@/components/app-layout"
 import { SpanDesign } from "@/components/span-design"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { motion } from "framer-motion"
 import {
   BookOpen,
-  Video,
-  ShoppingBag,
-  User,
-  Receipt,
   Play,
   Clock,
   CheckCircle,
   Star,
-  Crown,
   Sparkles,
   Heart,
-  Compass,
   Moon,
-  Sun,
-  Camera,
-  Lock,
-  Shield,
-  Upload,
-  Mail,
-  Settings,
-  Bell,
-  CreditCard,
-  BarChart3,
   TrendingUp,
-  Users,
   Award,
   Calendar,
-  Download,
-  Eye,
-  EyeOff
+  Zap,
+  Crown,
+  Target,
+  ArrowRight,
+  Users,
+  Globe,
+  Shield
 } from 'lucide-react'
+import Link from 'next/link'
 
-interface User {
+interface UserData {
   id: string
   email: string
   created_at: string
-  profile_image?: string
-  full_name?: string
-  bio?: string
+  user_metadata: {
+    full_name?: string
+    first_name?: string
+    last_name?: string
+    avatar_url?: string
+  }
 }
 
-interface PasswordFormData {
-  currentPassword: string
-  newPassword: string
-  confirmPassword: string
+interface UserStats {
+  totalCourses: number
+  completedCourses: number
+  totalHours: number
+  currentStreak: number
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserData | null>(null)
+  const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("overview")
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
-  const [passwordForm, setPasswordForm] = useState<PasswordFormData>({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  })
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
-  const [uploadingImage, setUploadingImage] = useState(false)
   const router = useRouter()
 
-  // TEMPORÄR: Auth-Schutz deaktiviert für Entwicklung
   useEffect(() => {
-    // Mock User für Entwicklung
-    const mockUser = {
-      id: 'temp-user-id',
-      email: 'user@ozean-licht.com',
-      created_at: new Date().toISOString(),
-      profile_image: 'https://api.ozean-licht.com/storage/v1/object/public/assets/People%20Illustration/People_6.png',
-      full_name: 'Lichtarbeiter Max',
-      bio: 'Auf dem Weg zur Erleuchtung durch metaphysisches Wissen und galaktische Weisheiten.'
-    }
-    setUser(mockUser)
-    setLoading(false)
-  }, [])
+    const fetchUserData = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient()
+        
+        // Get user from Supabase Auth
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+        
+        if (authError || !authUser) {
+          console.error('Auth error:', authError)
+          router.push('/login')
+          return
+        }
 
-  // Handler für Profil-Bild Upload
-  const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+        setUser(authUser as UserData)
 
-    setProfileImageFile(file)
-    setUploadingImage(true)
+        // Fetch user stats (courses, progress, etc.)
+        // TODO: Implement real queries
+        setStats({
+          totalCourses: 8,
+          completedCourses: 3,
+          totalHours: 47,
+          currentStreak: 12
+        })
 
-    // Mock Upload-Prozess
-    setTimeout(() => {
-      const imageUrl = URL.createObjectURL(file)
-      setUser(prev => prev ? { ...prev, profile_image: imageUrl } : null)
-      setUploadingImage(false)
-      setProfileImageFile(null)
-    }, 2000)
-  }
-
-  // Handler für Passwort-Reset
-  const handlePasswordReset = async () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('Die neuen Passwörter stimmen nicht überein!')
-      return
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    // Mock Passwort-Reset
-    alert('Passwort erfolgreich geändert!')
-    setPasswordForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    })
-    setShowPasswordDialog(false)
-  }
+    fetchUserData()
+  }, [router])
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-24 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="h-8 w-8 text-primary" />
+          </motion.div>
+        </div>
+      </AppLayout>
     )
   }
 
+  if (!user) {
+    return null
+  }
+
+  // Extract name and member number
+  const firstName = user.user_metadata?.first_name || user.email.split('@')[0]
+  const lastName = user.user_metadata?.last_name || ''
+  const fullName = user.user_metadata?.full_name || `${firstName} ${lastName}`.trim()
+  const memberNumber = user.id.slice(-8).toUpperCase()
+  const joinDate = new Date(user.created_at)
+  const completionRate = stats ? Math.round((stats.completedCourses / stats.totalCourses) * 100) : 0
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
+
   return (
-    <AppLayout>
-      <div className="p-6">
-        {/* Header Section with SpanDesign */}
-        <div className="text-center mb-12">
-          <SpanDesign>Meine Zentrale</SpanDesign>
-        </div>
-
-        {/* Personalisiertes Willkommen */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-cinzel-decorative font-normal text-foreground mb-8">
-            Sei gegrüßt, {user?.full_name || user?.email.split('@')[0]}
-          </h1>
-
-          {/* Profil-Bereich zentriert */}
-          <div className="flex flex-col items-center gap-4 mb-8">
-            <Avatar className="w-12 h-12">
-              <AvatarImage
-                src={user?.profile_image || "https://api.ozean-licht.com/storage/v1/object/public/assets/People%20Illustration/People_6.png"}
-                alt={user?.full_name || user?.email.split('@')[0]}
-              />
-              <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                {user?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="text-center">
-              <h2 className="text-xl font-cinzel-decorative font-normal text-foreground mb-1">
-                {user?.full_name || `Lichtarbeiter ${user?.email.split('@')[0]}`}
-              </h2>
-              <p className="text-muted-foreground text-sm mb-2">
-                Mitglied seit {new Date(user.created_at).toLocaleDateString('de-DE')}
-              </p>
-              <p className="text-primary/70 text-xs">
-                Mitgliedsnummer: #{user.id.slice(-6).toUpperCase()}
-              </p>
-            </div>
+    <AppLayout breadcrumbs={[{ label: 'Dashboard' }]}>
+      <div className="p-6 space-y-8">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="text-center mb-8">
+            <SpanDesign>Deine Zentrale</SpanDesign>
           </div>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Dein spiritueller Raum für tiefe Transformation, galaktisches Wissen und die Verbindung mit deinem höheren Selbst
-          </p>
-        </div>
-
-        {/* Main Dashboard Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-primary/5 border border-primary/20">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Übersicht</span>
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Profil</span>
-            </TabsTrigger>
-            <TabsTrigger value="courses" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Kurse</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Einstellungen</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Übersicht Tab */}
-          <TabsContent value="overview">
-            <div className="space-y-8">
-              {/* Welcome Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-primary/20 rounded-lg">
-                      <BookOpen className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-primary">3</p>
-                      <p className="text-sm text-muted-foreground">Aktive Kurse</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-green-500/20 rounded-lg">
-                      <Award className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-green-600">85%</p>
-                      <p className="text-sm text-muted-foreground">Gesamtfortschritt</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-500/20 rounded-lg">
-                      <Clock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-blue-600">47h</p>
-                      <p className="text-sm text-muted-foreground">Lernzeit</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-purple-500/20 rounded-lg">
-                      <TrendingUp className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-purple-600">+12%</p>
-                      <p className="text-sm text-muted-foreground">Diese Woche</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              {/* Recent Activity */}
-              <Card className="p-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                    <Calendar className="h-5 w-5" />
-                    Letzte Aktivitäten
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="font-medium">Sirianische Lichtkodierungen - Modul 2 abgeschlossen</p>
-                        <p className="text-sm text-muted-foreground">Vor 2 Stunden</p>
-                      </div>
-                      <Badge variant="secondary">+25 XP</Badge>
-                    </div>
-                    <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="font-medium">Neue Transmission verfügbar: Plejadische Heilung</p>
-                        <p className="text-sm text-muted-foreground">Vor 1 Tag</p>
-                      </div>
-                      <Badge variant="outline">Neu</Badge>
-                    </div>
-                    <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="font-medium">Wöchentliches Ziel erreicht: 5h Lernzeit</p>
-                        <p className="text-sm text-muted-foreground">Vor 3 Tagen</p>
-                      </div>
-                      <Award className="h-4 w-4 text-yellow-500" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="p-6 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/40">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Play className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-cinzel-decorative font-normal mb-2">Kurs fortsetzen</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Setze deine spirituelle Reise fort</p>
-                    <Button className="w-full">Weiterlernen</Button>
-                  </div>
-                </Card>
-
-                <Card className="p-6 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/40">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Moon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-cinzel-decorative font-normal mb-2">Transmissions</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Höre galaktische Weisheiten</p>
-                    <Button variant="outline" className="w-full">Anhören</Button>
-                  </div>
-                </Card>
-
-                <Card className="p-6 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/40">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Users className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-cinzel-decorative font-normal mb-2">Community</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Verbinde dich mit Lichtarbeitern</p>
-                    <Button variant="outline" className="w-full">Teilnehmen</Button>
-                  </div>
-                </Card>
-              </div>
+          {/* Hero Card */}
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
+                backgroundSize: '32px 32px'
+              }} />
             </div>
-          </TabsContent>
 
-          {/* Profil Tab */}
-          <TabsContent value="profile">
-            <div className="max-w-4xl mx-auto space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-cinzel-decorative font-normal mb-4">Dein Spirituelles Profil</h2>
-                <p className="text-muted-foreground">Verwalte deine persönlichen Daten und dein spirituelles Profil</p>
+            <CardContent className="p-8 relative">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                {/* Avatar */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                >
+                  <Avatar className="w-24 h-24 border-4 border-primary/20">
+                    <AvatarImage
+                      src={user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
+                      alt={fullName}
+                    />
+                    <AvatarFallback className="bg-primary/20 text-primary text-2xl">
+                      {firstName.charAt(0)}{lastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </motion.div>
+
+                {/* User Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h1 className="text-3xl md:text-4xl font-cinzel-decorative font-normal text-foreground mb-2">
+                      Willkommen zurück, {firstName}!
+                    </h1>
+                    <p className="text-muted-foreground mb-4">
+                      Setze deine spirituelle Reise fort und erweitere dein Bewusstsein
+                    </p>
+                  </motion.div>
+
+                  {/* Member Info */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm"
+                  >
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg">
+                      <Shield className="h-4 w-4 text-primary" />
+                      <span className="text-muted-foreground">Mitgliedsnummer:</span>
+                      <span className="font-mono font-bold text-primary">{memberNumber}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 px-4 py-2 bg-background/50 border border-primary/10 rounded-lg">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Mitglied seit:</span>
+                      <span className="font-medium text-foreground">
+                        {joinDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <Badge className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/30">
+                      <Crown className="h-4 w-4 mr-2 text-amber-500" />
+                      Lichtarbeiter
+                    </Badge>
+                  </motion.div>
+                </div>
+
+                {/* Quick Actions */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-col gap-2"
+                >
+                  <Button asChild className="gap-2">
+                    <Link href="/bibliothek">
+                      <BookOpen className="h-4 w-4" />
+                      Meine Kurse
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="gap-2">
+                    <Link href="/courses">
+                      <Sparkles className="h-4 w-4" />
+                      Neue Kurse
+                    </Link>
+                  </Button>
+                </motion.div>
               </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Profil Bild */}
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                      <Camera className="h-5 w-5" />
-                      Profilbild
+        {/* Stats Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {/* Total Courses */}
+          <motion.div variants={itemVariants}>
+            <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
+                    <BookOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    +2 diese Woche
+                  </Badge>
+                </div>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {stats?.totalCourses || 0}
+                </p>
+                <p className="text-sm text-muted-foreground">Aktive Kurse</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Completion Rate */}
+          <motion.div variants={itemVariants}>
+            <Card className="border-green-500/20 hover:border-green-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10 group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-green-500/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
+                    <Award className="h-6 w-6 text-green-500" />
+                  </div>
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {completionRate}%
+                </p>
+                <p className="text-sm text-muted-foreground">Abschlussrate</p>
+                <Progress value={completionRate} className="mt-3 h-2" />
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Learning Hours */}
+          <motion.div variants={itemVariants}>
+            <Card className="border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
+                    <Clock className="h-6 w-6 text-blue-500" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    +5h diese Woche
+                  </Badge>
+                </div>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {stats?.totalHours || 0}h
+                </p>
+                <p className="text-sm text-muted-foreground">Lernzeit insgesamt</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Current Streak */}
+          <motion.div variants={itemVariants}>
+            <Card className="border-amber-500/20 hover:border-amber-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-amber-500/10 rounded-xl group-hover:bg-amber-500/20 transition-colors">
+                    <Zap className="h-6 w-6 text-amber-500" />
+                  </div>
+                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {stats?.currentStreak || 0}
+                </p>
+                <p className="text-sm text-muted-foreground">Tage Streak 🔥</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Continue Learning */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+            className="lg:col-span-2"
+          >
+            <Card className="border-primary/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-cinzel-decorative font-normal flex items-center gap-2">
+                      <Play className="h-5 w-5 text-primary" />
+                      Lernfortschritt
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-center">
-                      <Avatar className="w-24 h-24">
-                        <AvatarImage src={user?.profile_image} alt={user?.full_name} />
-                        <AvatarFallback className="text-2xl">
-                          {user?.full_name?.charAt(0) || user?.email?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="profile-image">Neues Bild hochladen</Label>
-                      <Input
-                        id="profile-image"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfileImageUpload}
-                        disabled={uploadingImage}
-                        className="cursor-pointer"
-                      />
-                      {uploadingImage && (
-                        <div className="flex items-center gap-2 text-sm text-primary">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                          Hochladen...
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Persönliche Informationen */}
-                <Card className="p-6 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                      <User className="h-5 w-5" />
-                      Persönliche Informationen
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="full_name">Vollständiger Name</Label>
-                        <Input
-                          id="full_name"
-                          defaultValue={user?.full_name}
-                          placeholder="Dein spiritueller Name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">E-Mail</Label>
-                        <Input
-                          id="email"
-                          defaultValue={user?.email}
-                          disabled
-                          className="bg-muted"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Spirituelle Biografie</Label>
-                      <Textarea
-                        id="bio"
-                        defaultValue={user?.bio}
-                        placeholder="Erzähle etwas über deinen spirituellen Weg..."
-                        rows={4}
-                      />
-                    </div>
-
-                    <div className="flex gap-4 pt-4">
-                      <Button className="flex-1">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Speichern
-                      </Button>
-                      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline">
-                            <Lock className="h-4 w-4 mr-2" />
-                            Passwort ändern
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>Passwort ändern</DialogTitle>
-                            <DialogDescription>
-                              Gib dein aktuelles Passwort und ein neues Passwort ein.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="current-password">Aktuelles Passwort</Label>
-                              <div className="relative">
-                                <Input
-                                  id="current-password"
-                                  type={showCurrentPassword ? "text" : "password"}
-                                  value={passwordForm.currentPassword}
-                                  onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                                />
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                >
-                                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="new-password">Neues Passwort</Label>
-                              <div className="relative">
-                                <Input
-                                  id="new-password"
-                                  type={showNewPassword ? "text" : "password"}
-                                  value={passwordForm.newPassword}
-                                  onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                                />
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                  onClick={() => setShowNewPassword(!showNewPassword)}
-                                >
-                                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="confirm-password">Passwort bestätigen</Label>
-                              <Input
-                                id="confirm-password"
-                                type="password"
-                                value={passwordForm.confirmPassword}
-                                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                              />
+                    <CardDescription>
+                      Setze deine spirituelle Reise fort
+                    </CardDescription>
+                  </div>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/bibliothek" className="gap-2">
+                      Alle anzeigen
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Course Progress Cards */}
+                {[
+                  {
+                    title: 'Sirianische Lichtkodierungen',
+                    progress: 75,
+                    image: 'https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/sirian-gateway-event-thumbnail.webp',
+                    tag: 'Sirianisch',
+                    nextLesson: 'Modul 3: Frequenz-Aktivierung'
+                  },
+                  {
+                    title: 'Plejadische Ascension',
+                    progress: 42,
+                    image: 'https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/free-video-1.webp',
+                    tag: 'Plejadisch',
+                    nextLesson: 'Modul 2: DNA-Aktivierung'
+                  }
+                ].map((course, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 + index * 0.1 }}
+                  >
+                    <Card className="border-primary/10 hover:border-primary/30 transition-all group cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex gap-4">
+                          {/* Thumbnail */}
+                          <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/5">
+                            <img
+                              src={course.image}
+                              alt={course.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Play className="h-6 w-6 text-white" />
                             </div>
                           </div>
-                          <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
-                              Abbrechen
-                            </Button>
-                            <Button onClick={handlePasswordReset}>
-                              Passwort ändern
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
 
-          {/* Kurse Tab */}
-          <TabsContent value="courses">
-            <div className="space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-cinzel-decorative font-normal mb-4">Meine Kurse</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Verfolge deinen Fortschritt und setze deine spirituelle Entwicklung fort.
-                </p>
-              </div>
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div>
+                                <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                                  {course.title}
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  {course.nextLesson}
+                                </p>
+                              </div>
+                              <Badge variant="outline" className="text-xs flex-shrink-0">
+                                {course.tag}
+                              </Badge>
+                            </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-transparent">
-                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative">
-                    <img
-                      src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/sirian-gateway-event-thumbnail.webp"
-                      alt="Sirianische Lichtkodierungen"
-                      className="w-full h-full object-cover opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center opacity-0 hover:opacity-100 transition-opacity p-4">
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-lg">
-                        <Play className="h-4 w-4 mr-2" />
-                        Fortsetzen
-                      </Button>
-                    </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                        Sirianisch
-                      </Badge>
-                      <div className="flex items-center gap-1">
-                        <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500" style={{ width: '75%' }}></div>
+                            {/* Progress */}
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-muted-foreground">Fortschritt</span>
+                                <span className="font-medium text-primary">{course.progress}%</span>
+                              </div>
+                              <Progress value={course.progress} className="h-2" />
+                            </div>
+                          </div>
                         </div>
-                        <span className="text-xs text-muted-foreground">75%</span>
-                      </div>
-                    </div>
-                    <h3 className="font-medium mb-2 font-cinzel text-lg">Sirianische Lichtkodierungen</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Entdecke die heilenden Frequenzen der Sirianischen Lichtkodierungen.
-                    </p>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Modul 2 von 3</span>
-                      <span>47 Lektionen</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
 
-                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-transparent">
-                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative">
-                    <img
-                      src="https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/free-video-1.webp"
-                      alt="Plejadian Ascension"
-                      className="w-full h-full object-cover opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center opacity-0 hover:opacity-100 transition-opacity p-4">
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-lg">
-                        <Play className="h-4 w-4 mr-2" />
-                        Starten
-                      </Button>
+          {/* Quick Links & Activity */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8 }}
+            className="space-y-6"
+          >
+            {/* Quick Links */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-xl font-cinzel-decorative font-normal flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  Schnellzugriff
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                  <Link href="/bibliothek">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <span>Bibliothek</span>
+                  </Link>
+                </Button>
+                
+                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                  <Link href="/courses">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <span>Kurse durchstöbern</span>
+                  </Link>
+                </Button>
+
+                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                  <Link href="/magazine">
+                    <Globe className="h-5 w-5 text-primary" />
+                    <span>Magazin</span>
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Activity Feed */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-xl font-cinzel-decorative font-normal flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Letzte Aktivitäten
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  {
+                    icon: CheckCircle,
+                    color: 'text-green-500',
+                    text: 'Modul 2 abgeschlossen',
+                    time: 'vor 2h'
+                  },
+                  {
+                    icon: Star,
+                    color: 'text-amber-500',
+                    text: 'Level Up: Fortgeschritten',
+                    time: 'gestern'
+                  },
+                  {
+                    icon: Heart,
+                    color: 'text-pink-500',
+                    text: 'Kurs favorisiert',
+                    time: 'vor 3 Tagen'
+                  }
+                ].map((activity, index) => (
+                  <div key={index} className="flex items-start gap-3 text-sm">
+                    <activity.icon className={`h-5 w-5 ${activity.color} flex-shrink-0 mt-0.5`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-foreground truncate">{activity.text}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
                     </div>
                   </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                        Plejadisch
-                      </Badge>
-                      <div className="flex items-center gap-1">
-                        <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500" style={{ width: '25%' }}></div>
-                        </div>
-                        <span className="text-xs text-muted-foreground">25%</span>
-                      </div>
-                    </div>
-                    <h3 className="font-medium mb-2 font-cinzel text-lg">Plejadian Ascension</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Aktiviere dein göttliches Potential mit plejadischem Wissen.
-                    </p>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Modul 1 von 5</span>
-                      <span>32 Lektionen</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
 
-                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-transparent">
-                  <div className="p-8 text-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <BookOpen className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Neue Kurse entdecken</h3>
-                    <p className="text-sm text-muted-foreground mb-6">
-                      Erweitere dein spirituelles Wissen mit weiteren Kursen.
-                    </p>
-                    <Button className="w-full" onClick={() => router.push('/courses')}>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Kurse durchsuchen
-                    </Button>
+        {/* Recommendation Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 overflow-hidden relative">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
+                backgroundSize: '24px 24px'
+              }} />
+            </div>
+
+            <CardContent className="p-8 relative">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl">
+                    <Moon className="h-8 w-8 text-primary" />
                   </div>
-                </Card>
+                  <div>
+                    <h3 className="text-2xl font-cinzel-decorative font-normal text-foreground mb-1">
+                      Bereit für mehr?
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Entdecke neue galaktische Weisheiten und erweitere dein Bewusstsein
+                    </p>
+                  </div>
+                </div>
+                <Button size="lg" asChild className="gap-2 shadow-lg">
+                  <Link href="/courses">
+                    <Sparkles className="h-5 w-5" />
+                    Neue Kurse entdecken
+                  </Link>
+                </Button>
               </div>
-            </div>
-          </TabsContent>
-
-          {/* Einstellungen Tab */}
-          <TabsContent value="settings">
-            <div className="max-w-4xl mx-auto space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-cinzel-decorative font-normal mb-4">Einstellungen</h2>
-                <p className="text-muted-foreground">Verwalte deine Kontoeinstellungen und Präferenzen</p>
-              </div>
-
-              <div className="space-y-6">
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                      <Bell className="h-5 w-5" />
-                      Benachrichtigungen
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Neue Kurse verfügbar</p>
-                        <p className="text-sm text-muted-foreground">Erhalte Benachrichtigungen über neue Kurse</p>
-                      </div>
-                      <input type="checkbox" defaultChecked className="rounded" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Live Transmissions</p>
-                        <p className="text-sm text-muted-foreground">Benachrichtigungen über Live-Events</p>
-                      </div>
-                      <input type="checkbox" defaultChecked className="rounded" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Wöchentliche Zusammenfassung</p>
-                        <p className="text-sm text-muted-foreground">Wöchentlicher Fortschrittsbericht</p>
-                      </div>
-                      <input type="checkbox" defaultChecked className="rounded" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                      <Shield className="h-5 w-5" />
-                      Datenschutz & Sicherheit
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Zwei-Faktor-Authentifizierung</p>
-                        <p className="text-sm text-muted-foreground">Erhöhte Sicherheit für dein Konto</p>
-                      </div>
-                      <Button variant="outline" size="sm">Aktivieren</Button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Sitzungsverwaltung</p>
-                        <p className="text-sm text-muted-foreground">Verwalte aktive Sitzungen</p>
-                      </div>
-                      <Button variant="outline" size="sm">Verwalten</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-cinzel-decorative font-normal">
-                      <CreditCard className="h-5 w-5" />
-                      Abonnement & Zahlungen
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Aktueller Plan</p>
-                        <p className="text-sm text-muted-foreground">Lichtarbeiter Premium - €29.99/Monat</p>
-                      </div>
-                      <Badge>aktiv</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Nächste Zahlung</p>
-                        <p className="text-sm text-muted-foreground">15. Januar 2025</p>
-                      </div>
-                      <Button variant="outline" size="sm">Plan ändern</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-6 border-red-500/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-red-600 font-cinzel-decorative font-normal">
-                      <Download className="h-5 w-5" />
-                      Daten & Konto
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Daten exportieren</p>
-                        <p className="text-sm text-muted-foreground">Lade all deine Daten herunter</p>
-                      </div>
-                      <Button variant="outline" size="sm">Exportieren</Button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-red-600">Konto löschen</p>
-                        <p className="text-sm text-muted-foreground">Permanente Löschung aller Daten</p>
-                      </div>
-                      <Button variant="destructive" size="sm">Konto löschen</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </AppLayout>
   )

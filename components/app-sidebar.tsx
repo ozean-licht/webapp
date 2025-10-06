@@ -32,10 +32,16 @@ const navigationItems = [
     description: "Übersicht & Fortschritt"
   },
   {
-    label: "Meine Kurse",
-    href: "/courses",
+    label: "Bibliothek",
+    href: "/bibliothek",
     icon: BookOpen,
-    description: "Kursbibliothek"
+    description: "Meine Kurse"
+  },
+  {
+    label: "Kurse",
+    href: "/courses",
+    icon: Sparkles,
+    description: "Alle Kurse"
   },
   {
     label: "Transmissions",

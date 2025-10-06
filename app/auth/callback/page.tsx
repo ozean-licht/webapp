@@ -69,6 +69,22 @@ export default function AuthCallbackPage() {
 
           if (sessionData.session) {
             console.log('✅ Session set successfully:', sessionData.session.user.email)
+            
+            // Check if user needs to set password (first time login)
+            const needsPasswordSetup = !sessionData.session.user.user_metadata?.password_set
+            console.log('🔐 Needs password setup:', needsPasswordSetup)
+            
+            if (needsPasswordSetup) {
+              console.log('🔄 Redirecting to password setup...')
+              setStatus('success')
+              setMessage('Willkommen! Bitte setze ein Passwort für dein Konto.')
+              
+              setTimeout(() => {
+                router.push('/setup-password')
+              }, 1500)
+              return
+            }
+            
             setStatus('success')
             setMessage('Erfolgreich angemeldet! Du wirst weitergeleitet...')
 
@@ -93,6 +109,22 @@ export default function AuthCallbackPage() {
 
         if (data.session) {
           console.log('✅ Existing session found:', data.session.user.email)
+          
+          // Check if user needs to set password (first time login)
+          const needsPasswordSetup = !data.session.user.user_metadata?.password_set
+          console.log('🔐 Needs password setup:', needsPasswordSetup)
+          
+          if (needsPasswordSetup) {
+            console.log('🔄 Redirecting to password setup...')
+            setStatus('success')
+            setMessage('Willkommen! Bitte setze ein Passwort für dein Konto.')
+            
+            setTimeout(() => {
+              router.push('/setup-password')
+            }, 1500)
+            return
+          }
+          
           setStatus('success')
           setMessage('Erfolgreich angemeldet! Du wirst weitergeleitet...')
 
