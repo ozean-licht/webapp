@@ -70,6 +70,29 @@ export default function AuthCallbackPage() {
           if (sessionData.session) {
             console.log('✅ Session set successfully:', sessionData.session.user.email)
             
+            // Auto-link orders to user on login
+            try {
+              console.log('🔗 Auto-linking orders to user...')
+              const linkResponse = await fetch('/api/link-user-orders', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userId: sessionData.session.user.id,
+                  email: sessionData.session.user.email
+                })
+              })
+              
+              if (linkResponse.ok) {
+                const linkResult = await linkResponse.json()
+                console.log('✅ Auto-link result:', linkResult)
+              }
+            } catch (linkError) {
+              console.error('⚠️ Error auto-linking orders (non-critical):', linkError)
+              // Don't block login if linking fails
+            }
+            
             // Check if user needs to set password (first time login)
             const needsPasswordSetup = !sessionData.session.user.user_metadata?.password_set
             console.log('🔐 Needs password setup:', needsPasswordSetup)
@@ -109,6 +132,29 @@ export default function AuthCallbackPage() {
 
         if (data.session) {
           console.log('✅ Existing session found:', data.session.user.email)
+          
+          // Auto-link orders to user on login
+          try {
+            console.log('🔗 Auto-linking orders to user...')
+            const linkResponse = await fetch('/api/link-user-orders', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: data.session.user.id,
+                email: data.session.user.email
+              })
+            })
+            
+            if (linkResponse.ok) {
+              const linkResult = await linkResponse.json()
+              console.log('✅ Auto-link result:', linkResult)
+            }
+          } catch (linkError) {
+            console.error('⚠️ Error auto-linking orders (non-critical):', linkError)
+            // Don't block login if linking fails
+          }
           
           // Check if user needs to set password (first time login)
           const needsPasswordSetup = !data.session.user.user_metadata?.password_set

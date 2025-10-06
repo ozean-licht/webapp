@@ -24,6 +24,7 @@ async function getUserCourses(userId: string) {
   console.log('🔍 Fetching courses for user:', userId)
   
   // Get all courses user has access to via paid orders
+  // Note: Status can be 'paid', 'Erfolgreich', or 'partial' for Ablefy orders
   const { data: orders, error } = await supabase
     .from('orders')
     .select(`
@@ -46,7 +47,7 @@ async function getUserCourses(userId: string) {
       )
     `)
     .eq('user_id', userId)
-    .eq('status', 'paid')
+    .in('status', ['paid', 'Erfolgreich', 'partial'])
     .not('course_id', 'is', null)
     .order('order_date', { ascending: false })
   
@@ -90,7 +91,7 @@ async function getDebugInfo(userId: string) {
   // Get all orders for this user (regardless of status)
   const { data: allOrders } = await supabase
     .from('orders')
-    .select('id, status, course_id, buyer_email, source')
+    .select('id, status, course_id, buyer_email, source, ablefy_order_number')
     .eq('user_id', userId)
   
   // Get user email
@@ -102,7 +103,13 @@ async function getDebugInfo(userId: string) {
     ordersByStatus: allOrders?.reduce((acc, order) => {
       acc[order.status] = (acc[order.status] || 0) + 1
       return acc
-    }, {} as Record<string, number>)
+    }, {} as Record<string, number>),
+    ordersWithCourses: allOrders?.filter(o => o.course_id).length || 0,
+    sampleOrders: allOrders?.slice(0, 3).map(o => ({
+      id: o.ablefy_order_number || o.id,
+      status: o.status,
+      has_course: !!o.course_id
+    }))
   }
 }
 
@@ -199,8 +206,9 @@ export default async function BibliotheKPage() {
                   <p>User Email: {debugInfo.userEmail}</p>
                   <p>User ID: {user.id}</p>
                   <p>Total Orders in Database: {debugInfo.totalOrders}</p>
+                  <p>Orders with Courses: {debugInfo.ordersWithCourses}</p>
                   <p>Orders by Status: {JSON.stringify(debugInfo.ordersByStatus)}</p>
-                  <p>Paid Orders with Courses: {debug.ordersWithCourses}</p>
+                  <p>Query Found: {debug.ordersWithCourses} orders</p>
                 </div>
                 {debug.orders && debug.orders.length > 0 && (
                   <details className="mt-4">
