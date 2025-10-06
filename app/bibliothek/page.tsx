@@ -20,8 +20,13 @@ export const dynamic = 'force-dynamic'
 async function getUserCourses(userId: string) {
   const supabase = await createClient()
   
-  // Debug: Log user ID
+  // Debug: Log user ID and auth state
   console.log('🔍 Fetching courses for user:', userId)
+  
+  // CRITICAL: Check if auth.uid() is set
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  console.log('🔐 Auth UID:', authUser?.id)
+  console.log('🔐 User ID Match:', authUser?.id === userId)
   
   // Get all courses user has access to via paid orders
   // Note: Status can be 'paid', 'Erfolgreich', or 'partial' for Ablefy orders
@@ -58,6 +63,17 @@ async function getUserCourses(userId: string) {
   
   console.log(`✅ Found ${orders?.length || 0} paid orders for user`)
   console.log('Orders:', JSON.stringify(orders, null, 2))
+  
+  // Debug RLS
+  if (orders?.length === 0) {
+    console.log('⚠️ No orders found - checking RLS...')
+    const { count, error: countError } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+    console.log('📊 Total orders for user (bypassing SELECT):', count)
+    if (countError) console.log('❌ Count error:', countError)
+  }
   
   // Filter out null courses and flatten
   const courses = orders
