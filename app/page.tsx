@@ -13,10 +13,12 @@ import { QuickFaq } from "@/components/quick-faq"
 import { BookPromo } from "@/components/book-promo"
 import { BlogPreview } from "@/components/blog-preview"
 import { CTA2 } from "@/components/cta-2"
+import { AuthRedirectHandler } from "@/components/auth-redirect-handler"
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background pt-24">
+      <AuthRedirectHandler />
       <Header />
       <main className="space-y-20">
         <Hero />
