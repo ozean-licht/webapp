@@ -22,7 +22,9 @@ import {
   Bell,
   Search,
   Menu,
-  ChevronRight
+  ChevronRight,
+  FileText,
+  Crown
 } from "lucide-react"
 
 interface BreadcrumbItem {
@@ -96,7 +98,7 @@ export function AppHeader({ breadcrumbs = [], onMenuClick, showSidebarToggle = t
   const displayBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : getDefaultBreadcrumbs()
 
   return (
-    <header className="bg-[#0A1A1A] border-b border-[#0E282E] w-full">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A1A1A]/80 backdrop-blur-md border-b border-[#0E282E] w-full">
       <div className="flex items-center justify-between px-6 py-3">
         {/* Left Section */}
         <div className="flex items-center gap-4">
@@ -123,7 +125,7 @@ export function AppHeader({ breadcrumbs = [], onMenuClick, showSidebarToggle = t
                 className="w-6 h-6"
               />
             </div>
-            <span className="text-white font-semibold text-lg font-cinzel">Ozean Licht</span>
+            <span className="text-white font-normal text-lg font-cinzel">Ozean Licht™</span>
           </Link>
 
           {/* Breadcrumbs */}
@@ -174,7 +176,7 @@ export function AppHeader({ breadcrumbs = [], onMenuClick, showSidebarToggle = t
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-[#0E282E]">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.profile_image || "https://api.ozean-licht.com/storage/v1/object/public/assets/People%20Illustration/People_6.png"} alt={user.email} />
+                    <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=1a2a3a" alt="User" />
                     <AvatarFallback className="bg-primary/20 text-primary text-sm">
                       {user.email.charAt(0).toUpperCase()}
                     </AvatarFallback>
@@ -184,13 +186,13 @@ export function AppHeader({ breadcrumbs = [], onMenuClick, showSidebarToggle = t
               <DropdownMenuContent className="w-56 bg-[#0A1A1A] border-[#0E282E]" align="end" forceMount>
                 <div className="flex items-center justify-start gap-3 p-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.profile_image || "https://api.ozean-licht.com/storage/v1/object/public/assets/People%20Illustration/People_6.png"} alt={user.email} />
+                    <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=1a2a3a" alt="User" />
                     <AvatarFallback className="bg-primary/20 text-primary">
                       {user.email.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-primary font-medium text-sm">
+                    <p className="text-primary font-normal text-sm">
                       {user.email.split('@')[0]}
                     </p>
                     <p className="text-muted-foreground text-xs max-w-[140px] truncate">
@@ -199,30 +201,34 @@ export function AppHeader({ breadcrumbs = [], onMenuClick, showSidebarToggle = t
                   </div>
                 </div>
                 <DropdownMenuSeparator className="bg-[#0E282E]" />
-                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer">
+                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer font-light">
                   <Link href="/dashboard" className="flex items-center gap-2">
                     <Home className="h-4 w-4" />
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer">
-                  <Link href="/courses" className="flex items-center gap-2">
+                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer font-light">
+                  <Link href="/bibliothek" className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4" />
-                    Meine Kurse
+                    Bibliothek
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Profil
+                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer font-light">
+                  <Link href="/belege" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Belege
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Einstellungen
+                <DropdownMenuItem asChild className="text-muted-foreground hover:text-primary hover:bg-[#0E282E] cursor-pointer font-light">
+                  <Link href="/mitgliedschaft" className="flex items-center gap-2">
+                    <Crown className="h-4 w-4" />
+                    Mitgliedschaft
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-[#0E282E]" />
                 <DropdownMenuItem
                   onClick={handleSignOut}
-                  className="text-red-400 hover:text-red-300 hover:bg-[#0E282E] cursor-pointer flex items-center gap-2"
+                  className="text-red-400 hover:text-red-300 hover:bg-[#0E282E] cursor-pointer flex items-center gap-2 font-light"
                 >
                   <LogOut className="h-4 w-4" />
                   Abmelden

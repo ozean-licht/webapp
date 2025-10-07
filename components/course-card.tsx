@@ -1,125 +1,169 @@
 "use client"
 
-import { PrimaryButton } from "@/components/primary-button"
-// Temporarily disable framer-motion to avoid export issues
-// import { motion } from "framer-motion"
 import Link from "next/link"
-import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Sparkles } from "lucide-react"
 
 interface Course {
   slug: string
   title: string
-  description: string
-  price: number
-  is_published: boolean
+  subtitle?: string
+  description?: string
+  price?: number
+  is_published?: boolean
   thumbnail_url_desktop?: string
   thumbnail_url_mobile?: string
-  course_code: number
-  created_at: string
-  updated_at: string
+  course_code?: number
+  tags?: string[]
+  created_at?: string
+  updated_at?: string
 }
 
 interface CourseCardProps {
   course: Course
-  variant?: "default" | "small" | "preview"
+  variant?: "default" | "compact"
+}
+
+// Tag-Farben für verschiedene Kategorien
+function getTagStyle(tag: string): string {
+  const tagLower = tag.toLowerCase();
+  
+  // LCQ = Gelb
+  if (tagLower === 'lcq') {
+    return 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/30';
+  }
+  // Master = Rötlich
+  if (tagLower === 'master') {
+    return 'bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30';
+  }
+  // Basis = Blau
+  if (tagLower === 'basis') {
+    return 'bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30';
+  }
+  // Aufbau = Rosa
+  if (tagLower === 'aufbau') {
+    return 'bg-pink-500/20 text-pink-300 border border-pink-500/30 hover:bg-pink-500/30';
+  }
+  // Fortgeschritten = Lila
+  if (tagLower === 'fortgeschritten') {
+    return 'bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30';
+  }
+  // Interview = Cyan
+  if (tagLower === 'interview') {
+    return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30';
+  }
+  // Q&A = Cyan
+  if (tagLower === 'q&a') {
+    return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30';
+  }
+  // Kostenlos = Grünliches Cyan (Teal)
+  if (tagLower === 'kostenlos') {
+    return 'bg-teal-500/20 text-teal-300 border border-teal-500/30 hover:bg-teal-500/30';
+  }
+  // Intensiv = Rot
+  if (tagLower === 'intensiv') {
+    return 'bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30';
+  }
+  
+  // Default style
+  return 'bg-gray-500/20 text-gray-300 border border-gray-500/30 hover:bg-gray-500/30';
 }
 
 export function CourseCard({ course, variant = "default" }: CourseCardProps) {
-  const isSmall = variant === "small"
-  const isPreview = variant === "preview"
-
-  // Use appropriate thumbnail based on variant
-  const thumbnailUrl = isSmall
-    ? (course.thumbnail_url_mobile || course.thumbnail_url_desktop || "/api/placeholder/400/225")
-    : (course.thumbnail_url_desktop || "/api/placeholder/600/337")
-
-  // Calculate 16:9 dimensions
-  const aspectRatio = 16 / 9
-  const height = isSmall ? 225 : isPreview ? 200 : 337
-  const width = height * aspectRatio
+  const isCompact = variant === "compact"
+  
+  const thumbnailUrl = course.thumbnail_url_desktop || 
+                       course.thumbnail_url_mobile || 
+                       "/api/placeholder/600/337"
 
   return (
     <Link href={`/courses/${course.slug}`}>
-      <div
-        className={`group w-full ${isSmall ? "max-w-[300px]" : isPreview ? "max-w-[400px]" : "max-w-[600px]"} mx-auto bg-[#0A1A1A] rounded-2xl overflow-hidden border border-[#0E282E] hover:border-primary/50 transition-all duration-300 relative cursor-pointer`}
-      >
-        {/* Course Image - 16:9 Aspect Ratio */}
-        <div className="w-full overflow-hidden relative group" style={{ aspectRatio: '16/9' }}>
-          <Image
+      <div className="group relative w-full max-w-[400px] mx-auto rounded-2xl overflow-hidden glass-card glass-hover transition-all duration-500 cursor-pointer">
+        {/* Cover Image Container */}
+        <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
+          {/* Main Image */}
+          <img
             src={thumbnailUrl}
             alt={course.title}
-            width={width}
-            height={height}
-            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-            priority={variant === "preview"}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-
-          {/* Quantum Energy Overlay */}
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"
+          
+          {/* Special 10px Blur Overlay - Das macht die Card besonders! */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-[10px] backdrop-blur-md bg-gradient-to-b from-transparent to-black/20"
             style={{
-              background: `radial-gradient(circle at center,
-                rgba(0, 18, 18, 0.1) 0%,
-                rgba(0, 18, 18, 0.3) 40%,
-                rgba(0, 18, 18, 0.6) 70%,
-                rgba(0, 18, 18, 0.8) 100%)`,
-              backdropFilter: `blur(0.5px)`,
-              WebkitBackdropFilter: `blur(0.5px)`,
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           />
-
+          
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
           {/* Price Badge */}
-          <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-white font-semibold text-sm">
-              €{course.price}
-            </span>
-          </div>
-        </div>
-
-        {/* Content Overlay */}
-        <div
-          className={`absolute bottom-0 left-0 right-0 ${isSmall ? "p-4" : "p-6"} flex flex-col justify-end`}
-          style={{
-            height: "50%",
-            background: `linear-gradient(to bottom,
-              rgba(0, 18, 18, 0) 0%,
-              rgba(0, 18, 18, 0.3) 40%,
-              rgba(0, 18, 18, 0.8) 100%)`,
-          }}
-        >
-          <div className="relative flex flex-col space-y-2">
-            {/* Course Title */}
-            <h3
-              className={`text-white font-cinzel-decorative ${isSmall ? "text-lg" : "text-xl"} drop-shadow-lg leading-tight`}
-              style={{ textShadow: "0 2px 4px rgba(0, 0, 0, 0.8)" }}
-            >
-              {course.title}
-            </h3>
-
-            {/* Course Description - Short version */}
-            <p
-              className={`text-white/90 font-montserrat-alt ${isSmall ? "text-sm" : "text-base"} line-clamp-2 drop-shadow-md`}
-              style={{ textShadow: "0 1px 3px rgba(0, 0, 0, 0.7)" }}
-            >
-              {course.description?.substring(0, isSmall ? 80 : 120) || "Entdecke transformative Inhalte für dein spirituelles Wachstum."}
-              {course.description && course.description.length > (isSmall ? 80 : 120) ? "..." : ""}
-            </p>
-
-            {/* CTA Button */}
-            <div className="mt-3">
-              <PrimaryButton className="w-full opacity-90 group-hover:opacity-100 transition-opacity">
-                Kurs entdecken
-              </PrimaryButton>
+          {course.price !== undefined && (
+            <div className="absolute top-4 right-4 z-10">
+              <div className="glass-card-strong px-4 py-2 rounded-full border border-primary/30">
+                <span className="text-white font-semibold text-sm font-montserrat-alt">
+                  €{course.price}
+                </span>
+              </div>
             </div>
+          )}
+          
+          {/* Sparkle Effect on Hover */}
+          <div className="absolute top-4 left-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <Sparkles className="h-5 w-5 text-primary animate-pulse" />
           </div>
         </div>
 
-        {/* Hover Glow Effect */}
-        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-transparent to-primary/20 blur-xl" />
+        {/* Content Section - Glass Effect */}
+        <div className="relative p-6 space-y-4">
+          {/* Title */}
+          <h3 className="font-cinzel-decorative text-xl text-foreground leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-300">
+            {course.title}
+          </h3>
+          
+          {/* Subtitle or Description */}
+          {(course.subtitle || course.description) && (
+            <p className="text-sm text-muted-foreground font-light font-montserrat-alt line-clamp-2 leading-relaxed">
+              {course.subtitle || course.description?.substring(0, 100)}
+              {!course.subtitle && course.description && course.description.length > 100 ? "..." : ""}
+            </p>
+          )}
+          
+          {/* CTA Button */}
+          <Button 
+            className="w-full bg-primary hover:bg-primary/90 text-white font-normal font-montserrat-alt gap-2 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20"
+          >
+            <Sparkles className="h-4 w-4" />
+            Kurs entdecken
+          </Button>
+          
+          {/* Tags */}
+          {course.tags && course.tags.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mt-3">
+              {course.tags.map((tag) => (
+                <span
+                  key={`${course.course_code}-${tag}`}
+                  className={`
+                    px-3 py-1 rounded-full text-xs font-medium font-montserrat-alt
+                    transition-all duration-300
+                    ${getTagStyle(tag)}
+                  `}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Subtle Border Glow on Hover */}
+        <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10" />
         </div>
       </div>
     </Link>
   )
 }
-

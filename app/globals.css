@@ -44,6 +44,43 @@
   --font-montserrat-alternates: "Montserrat Alternates", sans-serif;
 }
 
+/* 🌊 Ozean Licht Card Utilities */
+/* Transparente Cards mit Backdrop-Blur für Dashboard */
+
+/* Basis Card */
+.glass-card {
+  background: rgba(10, 26, 26, 0.7); /* #0A1A1A mit 70% Opacity */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(24, 134, 137, 0.25); /* primary/25 */
+}
+
+/* Wichtige Card */
+.glass-card-strong {
+  background: rgba(10, 26, 26, 0.8); /* #0A1A1A mit 80% Opacity */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(24, 134, 137, 0.3); /* primary/30 */
+}
+
+/* Subtile Card */
+.glass-subtle {
+  background: rgba(10, 26, 26, 0.5); /* #0A1A1A mit 50% Opacity */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(24, 134, 137, 0.15); /* primary/15 */
+}
+
+/* Hover-Effekt - subtiler Glow */
+.glass-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-hover:hover {
+  border-color: rgba(24, 134, 137, 0.4); /* primary/40 */
+  box-shadow: 0 0 20px rgba(24, 134, 137, 0.15);
+}
+
 .dark {
   --background: #000F0F;
   --foreground: #ffffff;

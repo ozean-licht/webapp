@@ -32,6 +32,7 @@ export interface ModuleContent {
   content_type: 'video' | 'text' | 'pdf' | 'audio' | 'quiz'
   content_url?: string
   content_text?: string
+  thumbnail_url?: string
   order_index: number
   is_published: boolean
   duration_minutes?: number

@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from "lucide-react"
 import { Button } from "./ui/button"
+import { BackgroundModeSwitch } from "./background-mode-switch"
 
 interface AppSidebarProps {
   isOpen: boolean
@@ -68,7 +69,7 @@ export function AppSidebar({ isOpen }: AppSidebarProps) {
 
   if (!isOpen) {
     return (
-      <div className="w-16 bg-[#0A1A1A] border-r border-[#0E282E] flex flex-col items-center py-4">
+      <div className="fixed left-0 top-[57px] bottom-0 w-16 bg-[#0A1A1A]/80 backdrop-blur-md border-r border-[#0E282E] flex flex-col items-center py-4 z-40">
         <div className="flex flex-col gap-2">
           {navigationItems.map((item) => {
             const Icon = item.icon
@@ -94,7 +95,7 @@ export function AppSidebar({ isOpen }: AppSidebarProps) {
   }
 
   return (
-    <div className="w-64 bg-[#0A1A1A] border-r border-[#0E282E] flex flex-col">
+    <div className="fixed left-0 top-[57px] bottom-0 w-64 bg-[#0A1A1A]/80 backdrop-blur-md border-r border-[#0E282E] flex flex-col font-montserrat-alt z-40">
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6">
         <div className="space-y-2">
@@ -106,15 +107,40 @@ export function AppSidebar({ isOpen }: AppSidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-12 px-3 text-left hover:bg-[#0E282E] hover:text-primary",
-                    isActive && "bg-primary/20 text-primary hover:bg-primary/30 border-l-2 border-primary"
+                    "w-full justify-start gap-3 h-auto py-3 px-4 text-left transition-all duration-300 font-montserrat-alt rounded-xl",
+                    "hover:bg-gradient-to-r hover:from-[#0E282E] hover:to-[#0A1A1A] hover:text-primary hover:shadow-lg hover:shadow-primary/5",
+                    isActive 
+                      ? "bg-gradient-to-r from-primary/20 via-primary/15 to-primary/10 text-primary shadow-lg shadow-primary/20 border border-primary/30 hover:border-primary/50 hover:shadow-primary/30" 
+                      : "border border-transparent"
                   )}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  <div className="flex flex-col items-start min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">{item.label}</span>
-                    <span className="text-xs text-muted-foreground truncate">{item.description}</span>
+                  <div className={cn(
+                    "p-2 rounded-lg transition-all duration-300",
+                    isActive 
+                      ? "bg-primary/20 shadow-lg shadow-primary/20" 
+                      : "bg-[#0E282E]/50"
+                  )}>
+                    <Icon className="h-4 w-4 flex-shrink-0" />
                   </div>
+                  <div className="flex flex-col items-start min-w-0 flex-1">
+                    <span className={cn(
+                      "text-sm font-light truncate transition-all duration-300",
+                      isActive && "font-normal"
+                    )}>
+                      {item.label}
+                    </span>
+                    <span className={cn(
+                      "text-xs font-light truncate transition-all duration-300",
+                      isActive ? "text-primary/70" : "text-muted-foreground"
+                    )}>
+                      {item.description}
+                    </span>
+                  </div>
+                  {isActive && (
+                    <div className="flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+                    </div>
+                  )}
                 </Button>
               </Link>
             )
@@ -122,6 +148,8 @@ export function AppSidebar({ isOpen }: AppSidebarProps) {
         </div>
       </nav>
 
+      {/* Background Mode Switch */}
+      <BackgroundModeSwitch />
     </div>
   )
 }

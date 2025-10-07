@@ -33,23 +33,32 @@ export function CourseFilter({ className, onFilterChange }: CourseFilterProps) {
           <SelectItem value="all" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
             Alle Kurse
           </SelectItem>
-          <SelectItem value="free" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
-            Kostenlos
+          <SelectItem value="lcq" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            LCQ - Channeling Events
           </SelectItem>
-          <SelectItem value="basic" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
-            Basis Kurse
+          <SelectItem value="basis" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Basis
           </SelectItem>
-          <SelectItem value="advanced" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+          <SelectItem value="aufbau" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Aufbau
+          </SelectItem>
+          <SelectItem value="fortgeschritten" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
             Fortgeschritten
           </SelectItem>
-          <SelectItem value="premium" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
-            Premium
+          <SelectItem value="master" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Master
           </SelectItem>
-          <SelectItem value="spiritual" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
-            Spirituell
+          <SelectItem value="interview" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Interview
           </SelectItem>
-          <SelectItem value="quantum" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
-            Quanten-Transformation
+          <SelectItem value="q&a" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Q&A
+          </SelectItem>
+          <SelectItem value="kostenlos" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Kostenlos
+          </SelectItem>
+          <SelectItem value="intensiv" className="text-white hover:bg-[#0E282E] focus:bg-[#0E282E]">
+            Intensiv
           </SelectItem>
         </SelectContent>
       </Select>

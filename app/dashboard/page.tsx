@@ -7,29 +7,22 @@ import { AppLayout } from "@/components/app-layout"
 import { SpanDesign } from "@/components/span-design"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { motion } from "framer-motion"
 import {
   BookOpen,
   Play,
-  Clock,
   CheckCircle,
   Star,
   Sparkles,
   Heart,
   Moon,
   TrendingUp,
-  Award,
   Calendar,
-  Zap,
-  Crown,
-  Target,
   ArrowRight,
-  Users,
   Globe,
-  Shield
+  Shield,
+  Receipt,
+  FileText
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -52,9 +45,33 @@ interface UserStats {
   currentStreak: number
 }
 
+interface Course {
+  id: string
+  title: string
+  subtitle?: string
+  slug: string
+  thumbnail_url_desktop?: string
+  purchase_date: string
+  last_viewed?: string
+}
+
+interface Order {
+  id: string
+  order_date: string
+  status: string
+  total_amount?: number
+  source: string
+  ablefy_order_number?: string
+  courses?: {
+    title: string
+  }
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [stats, setStats] = useState<UserStats | null>(null)
+  const [recentCourses, setRecentCourses] = useState<Course[]>([])
+  const [recentOrders, setRecentOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -74,13 +91,73 @@ export default function DashboardPage() {
 
         setUser(authUser as UserData)
 
-        // Fetch user stats (courses, progress, etc.)
-        // TODO: Implement real queries
+        // Fetch user's courses
+        const { data: orders, error: ordersError } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            course_id,
+            order_date,
+            courses (
+              id,
+              title,
+              subtitle,
+              slug,
+              thumbnail_url_desktop
+            )
+          `)
+          .eq('user_id', authUser.id)
+          .in('status', ['paid', 'Erfolgreich', 'partial'])
+          .not('course_id', 'is', null)
+          .order('order_date', { ascending: false })
+          .limit(3)
+
+        if (!ordersError && orders) {
+          const courses = orders
+            .filter(order => order.courses)
+            .map(order => ({
+              ...order.courses,
+              purchase_date: order.order_date,
+              last_viewed: order.order_date // TODO: Track actual view date
+            }))
+          setRecentCourses(courses as Course[])
+        }
+
+        // Fetch recent orders (last 3) for Belege section
+        const { data: allOrders, error: allOrdersError } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            order_date,
+            status,
+            total_amount,
+            source,
+            ablefy_order_number,
+            courses (
+              title
+            )
+          `)
+          .eq('user_id', authUser.id)
+          .order('order_date', { ascending: false })
+          .limit(3)
+
+        if (!allOrdersError && allOrders) {
+          setRecentOrders(allOrders as Order[])
+        }
+
+        // Calculate stats
+        const { count: totalCourses } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', authUser.id)
+          .in('status', ['paid', 'Erfolgreich', 'partial'])
+          .not('course_id', 'is', null)
+
         setStats({
-          totalCourses: 8,
-          completedCourses: 3,
-          totalHours: 47,
-          currentStreak: 12
+          totalCourses: totalCourses || 0,
+          completedCourses: 0, // TODO: Implement completion tracking
+          totalHours: 0, // TODO: Implement time tracking
+          currentStreak: 0 // TODO: Implement streak tracking
         })
 
       } catch (error) {
@@ -97,12 +174,10 @@ export default function DashboardPage() {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          >
+          <div className="flex flex-col items-center gap-4">
             <Sparkles className="h-8 w-8 text-primary" />
-          </motion.div>
+            <p className="text-sm text-muted-foreground font-montserrat-alt">Lädt...</p>
+          </div>
         </div>
       </AppLayout>
     )
@@ -118,241 +193,112 @@ export default function DashboardPage() {
   const fullName = user.user_metadata?.full_name || `${firstName} ${lastName}`.trim()
   const memberNumber = user.id.slice(-8).toUpperCase()
   const joinDate = new Date(user.created_at)
-  const completionRate = stats ? Math.round((stats.completedCourses / stats.totalCourses) * 100) : 0
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  }
 
   return (
     <AppLayout breadcrumbs={[{ label: 'Dashboard' }]}>
-      <div className="p-6 space-y-8">
+      <div className="p-6 space-y-8 font-montserrat-alt">
         {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="text-center mb-8">
-            <SpanDesign>Deine Zentrale</SpanDesign>
-          </div>
+        <div className="text-center mb-6">
+          <SpanDesign>Deine Zentrale</SpanDesign>
+        </div>
 
-          {/* Hero Card */}
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
-                backgroundSize: '32px 32px'
-              }} />
-            </div>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-cinzel-decorative font-normal text-foreground mb-3">
+            Willkommen zurück, {firstName}
+          </h1>
+          <p className="text-lg text-muted-foreground font-light">
+            Setze deine spirituelle Reise fort und erweitere dein Bewusstsein
+          </p>
+        </div>
 
-            <CardContent className="p-8 relative">
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                {/* Avatar */}
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                >
-                  <Avatar className="w-24 h-24 border-4 border-primary/20">
-                    <AvatarImage
-                      src={user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
-                      alt={fullName}
-                    />
-                    <AvatarFallback className="bg-primary/20 text-primary text-2xl">
-                      {firstName.charAt(0)}{lastName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                </motion.div>
+        {/* User Info Card */}
+        <Card className="glass-card-strong">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              {/* Avatar */}
+              <Avatar className="w-16 h-16 border-2 border-primary/20">
+                <AvatarImage
+                  src="https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=1a2a3a"
+                  alt="User"
+                />
+                <AvatarFallback className="bg-primary/20 text-primary text-base">
+                  {firstName.charAt(0)}{lastName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
 
-                {/* User Info */}
-                <div className="flex-1 text-center md:text-left">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <h1 className="text-3xl md:text-4xl font-cinzel-decorative font-normal text-foreground mb-2">
-                      Willkommen zurück, {firstName}!
-                    </h1>
-                    <p className="text-muted-foreground mb-4">
-                      Setze deine spirituelle Reise fort und erweitere dein Bewusstsein
-                    </p>
-                  </motion.div>
-
-                  {/* Member Info */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm"
-                  >
-                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg">
-                      <Shield className="h-4 w-4 text-primary" />
-                      <span className="text-muted-foreground">Mitgliedsnummer:</span>
-                      <span className="font-mono font-bold text-primary">{memberNumber}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 px-4 py-2 bg-background/50 border border-primary/10 rounded-lg">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Mitglied seit:</span>
-                      <span className="font-medium text-foreground">
-                        {joinDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}
-                      </span>
-                    </div>
-
-                    <Badge className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/30">
-                      <Crown className="h-4 w-4 mr-2 text-amber-500" />
-                      Lichtarbeiter
-                    </Badge>
-                  </motion.div>
+              {/* User Info */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-lg">
+                    <Shield className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-muted-foreground font-light">Mitgliedsnummer:</span>
+                    <span className="font-mono font-normal text-primary">{memberNumber}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0E282E] border border-primary/10 rounded-lg">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground font-light">Mitglied seit:</span>
+                    <span className="font-normal text-foreground">
+                      {joinDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
-
-                {/* Quick Actions */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-col gap-2"
-                >
-                  <Button asChild className="gap-2">
-                    <Link href="/bibliothek">
-                      <BookOpen className="h-4 w-4" />
-                      Meine Kurse
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="gap-2">
-                    <Link href="/courses">
-                      <Sparkles className="h-4 w-4" />
-                      Neue Kurse
-                    </Link>
-                  </Button>
-                </motion.div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+
+              {/* Quick Actions */}
+              <div className="flex gap-2">
+                <Button asChild size="sm" className="gap-2 font-normal">
+                  <Link href="/bibliothek">
+                    <BookOpen className="h-4 w-4" />
+                    Bibliothek
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="gap-2 font-normal">
+                  <Link href="/courses">
+                    <Sparkles className="h-4 w-4" />
+                    Portal
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Stats Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
+        <div className="max-w-xs">
           {/* Total Courses */}
-          <motion.div variants={itemVariants}>
-            <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
-                    <BookOpen className="h-6 w-6 text-primary" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs">
-                    +2 diese Woche
-                  </Badge>
+          <Card className="glass-card glass-hover">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <BookOpen className="h-4 w-4 text-primary" />
                 </div>
-                <p className="text-3xl font-bold text-foreground mb-1">
+                <p className="text-2xl font-normal text-foreground">
                   {stats?.totalCourses || 0}
                 </p>
-                <p className="text-sm text-muted-foreground">Aktive Kurse</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Completion Rate */}
-          <motion.div variants={itemVariants}>
-            <Card className="border-green-500/20 hover:border-green-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-green-500/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
-                    <Award className="h-6 w-6 text-green-500" />
-                  </div>
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                </div>
-                <p className="text-3xl font-bold text-foreground mb-1">
-                  {completionRate}%
-                </p>
-                <p className="text-sm text-muted-foreground">Abschlussrate</p>
-                <Progress value={completionRate} className="mt-3 h-2" />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Learning Hours */}
-          <motion.div variants={itemVariants}>
-            <Card className="border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                    <Clock className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs">
-                    +5h diese Woche
-                  </Badge>
-                </div>
-                <p className="text-3xl font-bold text-foreground mb-1">
-                  {stats?.totalHours || 0}h
-                </p>
-                <p className="text-sm text-muted-foreground">Lernzeit insgesamt</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Current Streak */}
-          <motion.div variants={itemVariants}>
-            <Card className="border-amber-500/20 hover:border-amber-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-amber-500/10 rounded-xl group-hover:bg-amber-500/20 transition-colors">
-                    <Zap className="h-6 w-6 text-amber-500" />
-                  </div>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                </div>
-                <p className="text-3xl font-bold text-foreground mb-1">
-                  {stats?.currentStreak || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">Tage Streak 🔥</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </motion.div>
+              </div>
+              <p className="text-xs text-muted-foreground font-light">Aktive Kurse</p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Continue Learning */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 }}
-            className="lg:col-span-2"
-          >
-            <Card className="border-primary/20">
+          <div className="lg:col-span-2">
+            <Card className="glass-card-strong">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-cinzel-decorative font-normal flex items-center gap-2">
+                    <CardTitle className="text-xl font-cinzel-decorative font-normal flex items-center gap-2">
                       <Play className="h-5 w-5 text-primary" />
-                      Lernfortschritt
+                      Zuletzt angesehen
                     </CardTitle>
-                    <CardDescription>
-                      Setze deine spirituelle Reise fort
+                    <CardDescription className="font-light">
+                      Deine zuletzt angesehenen Kurse
                     </CardDescription>
                   </div>
-                  <Button asChild variant="ghost" size="sm">
+                  <Button asChild variant="ghost" size="sm" className="font-normal">
                     <Link href="/bibliothek" className="gap-2">
                       Alle anzeigen
                       <ArrowRight className="h-4 w-4" />
@@ -360,200 +306,198 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Course Progress Cards */}
-                {[
-                  {
-                    title: 'Sirianische Lichtkodierungen',
-                    progress: 75,
-                    image: 'https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/sirian-gateway-event-thumbnail.webp',
-                    tag: 'Sirianisch',
-                    nextLesson: 'Modul 3: Frequenz-Aktivierung'
-                  },
-                  {
-                    title: 'Plejadische Ascension',
-                    progress: 42,
-                    image: 'https://suwevnhwtmcazjugfmps.supabase.co/storage/v1/object/public/assets/free-video-1.webp',
-                    tag: 'Plejadisch',
-                    nextLesson: 'Modul 2: DNA-Aktivierung'
-                  }
-                ].map((course, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + index * 0.1 }}
-                  >
-                    <Card className="border-primary/10 hover:border-primary/30 transition-all group cursor-pointer">
-                      <CardContent className="p-4">
-                        <div className="flex gap-4">
-                          {/* Thumbnail */}
-                          <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/5">
-                            <img
-                              src={course.image}
-                              alt={course.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Play className="h-6 w-6 text-white" />
+              <CardContent className="space-y-3">
+                {recentCourses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                    <p className="text-sm text-muted-foreground font-light">
+                      Du hast noch keine Kurse. Entdecke unsere Kurse und starte deine Reise!
+                    </p>
+                    <Button asChild size="sm" className="mt-4 font-normal">
+                      <Link href="/courses">
+                        Kurse durchstöbern
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  recentCourses.map((course, index) => (
+                    <Link key={course.id} href={`/courses/${course.slug}/learn`}>
+                      <Card className="glass-subtle glass-hover group cursor-pointer">
+                        <CardContent className="p-3">
+                          <div className="flex gap-3">
+                            {/* Thumbnail */}
+                            <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/5">
+                              {course.thumbnail_url_desktop ? (
+                                <img
+                                  src={course.thumbnail_url_desktop}
+                                  alt={course.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <BookOpen className="h-8 w-8 text-primary/30" />
+                                </div>
+                              )}
                             </div>
-                          </div>
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <div>
-                                <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-                                  {course.title}
-                                </h3>
-                                <p className="text-xs text-muted-foreground">
-                                  {course.nextLesson}
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-normal text-sm text-foreground truncate mb-1 group-hover:text-primary transition-colors">
+                                {course.title}
+                              </h3>
+                              {course.subtitle && (
+                                <p className="text-xs text-muted-foreground font-light mb-2 line-clamp-2">
+                                  {course.subtitle}
                                 </p>
-                              </div>
-                              <Badge variant="outline" className="text-xs flex-shrink-0">
-                                {course.tag}
-                              </Badge>
-                            </div>
+                              )}
 
-                            {/* Progress */}
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-muted-foreground">Fortschritt</span>
-                                <span className="font-medium text-primary">{course.progress}%</span>
-                              </div>
-                              <Progress value={course.progress} className="h-2" />
+                              <p className="text-xs text-muted-foreground font-light">
+                                Zuletzt angesehen: {new Date(course.last_viewed || course.purchase_date).toLocaleDateString('de-DE')}
+                              </p>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))
+                )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
-          {/* Quick Links & Activity */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 }}
-            className="space-y-6"
-          >
+          {/* Sidebar */}
+          <div className="space-y-6">
             {/* Quick Links */}
-            <Card className="border-primary/20">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="text-xl font-cinzel-decorative font-normal flex items-center gap-2">
-                  <Target className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg font-cinzel-decorative font-normal flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
                   Schnellzugriff
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                <Button asChild variant="outline" className="w-full justify-start gap-3 font-light" size="sm">
                   <Link href="/bibliothek">
-                    <BookOpen className="h-5 w-5 text-primary" />
+                    <BookOpen className="h-4 w-4 text-primary" />
                     <span>Bibliothek</span>
                   </Link>
                 </Button>
                 
-                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                <Button asChild variant="outline" className="w-full justify-start gap-3 font-light" size="sm">
                   <Link href="/courses">
-                    <Sparkles className="h-5 w-5 text-primary" />
+                    <Sparkles className="h-4 w-4 text-primary" />
                     <span>Kurse durchstöbern</span>
                   </Link>
                 </Button>
 
-                <Button asChild variant="outline" className="w-full justify-start gap-3" size="lg">
+                <Button asChild variant="outline" className="w-full justify-start gap-3 font-light" size="sm">
                   <Link href="/magazine">
-                    <Globe className="h-5 w-5 text-primary" />
+                    <Globe className="h-4 w-4 text-primary" />
                     <span>Magazin</span>
                   </Link>
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Activity Feed */}
-            <Card className="border-primary/20">
+            {/* Belege */}
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="text-xl font-cinzel-decorative font-normal flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Letzte Aktivitäten
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-cinzel-decorative font-normal flex items-center gap-2">
+                    <Receipt className="h-4 w-4 text-primary" />
+                    Belege
+                  </CardTitle>
+                  <Button asChild variant="ghost" size="sm" className="font-normal">
+                    <Link href="/belege" className="gap-2 text-xs">
+                      Alle Belege
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {[
-                  {
-                    icon: CheckCircle,
-                    color: 'text-green-500',
-                    text: 'Modul 2 abgeschlossen',
-                    time: 'vor 2h'
-                  },
-                  {
-                    icon: Star,
-                    color: 'text-amber-500',
-                    text: 'Level Up: Fortgeschritten',
-                    time: 'gestern'
-                  },
-                  {
-                    icon: Heart,
-                    color: 'text-pink-500',
-                    text: 'Kurs favorisiert',
-                    time: 'vor 3 Tagen'
-                  }
-                ].map((activity, index) => (
-                  <div key={index} className="flex items-start gap-3 text-sm">
-                    <activity.icon className={`h-5 w-5 ${activity.color} flex-shrink-0 mt-0.5`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-foreground truncate">{activity.text}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
+              <CardContent className="space-y-3">
+                {recentOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                    <p className="text-sm text-muted-foreground font-light">
+                      Noch keine Bestellungen vorhanden
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  recentOrders.map((order) => (
+                    <Card key={order.id} className="glass-subtle glass-hover">
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Receipt className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                              <p className="text-xs font-mono text-muted-foreground">
+                                {order.ablefy_order_number || order.id.slice(0, 8)}
+                              </p>
+                            </div>
+                            {order.courses && (
+                              <p className="text-sm text-foreground font-light truncate mb-1">
+                                {order.courses.title}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground font-light">
+                              {new Date(order.order_date).toLocaleDateString('de-DE', { 
+                                day: '2-digit', 
+                                month: 'short', 
+                                year: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className={`px-2 py-1 rounded text-xs font-medium ${
+                              order.status === 'paid' || order.status === 'Erfolgreich' 
+                                ? 'bg-green-500/10 text-green-500' 
+                                : 'bg-yellow-500/10 text-yellow-500'
+                            }`}>
+                              {order.status}
+                            </div>
+                            {order.total_amount && (
+                              <p className="text-sm font-medium text-foreground mt-1">
+                                €{order.total_amount}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
 
         {/* Recommendation Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-        >
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 overflow-hidden relative">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
-                backgroundSize: '24px 24px'
-              }} />
-            </div>
-
-            <CardContent className="p-8 relative">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl">
-                    <Moon className="h-8 w-8 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-cinzel-decorative font-normal text-foreground mb-1">
-                      Bereit für mehr?
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Entdecke neue galaktische Weisheiten und erweitere dein Bewusstsein
-                    </p>
-                  </div>
+        <Card className="glass-card glass-hover">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-xl">
+                  <Moon className="h-6 w-6 text-primary" />
                 </div>
-                <Button size="lg" asChild className="gap-2 shadow-lg">
-                  <Link href="/courses">
-                    <Sparkles className="h-5 w-5" />
-                    Neue Kurse entdecken
-                  </Link>
-                </Button>
+                <div>
+                  <h3 className="text-xl font-cinzel-decorative font-normal text-foreground mb-1">
+                    Bereit für mehr?
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-light">
+                    Entdecke neue galaktische Weisheiten
+                  </p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              <Button size="sm" asChild className="gap-2 font-normal">
+                <Link href="/courses">
+                  <Sparkles className="h-4 w-4" />
+                  Neue Kurse entdecken
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   )

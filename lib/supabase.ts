@@ -131,7 +131,7 @@ async function getCoursesDirect(limit: number = 50): Promise<any[]> {
   try {
     const { data, error } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, slug, title, subtitle, description, price, is_public, thumbnail_url_desktop, thumbnail_url_mobile, tags, created_at, updated_at')
       .eq('is_public', true)
       .order('updated_at', { ascending: false })
       .limit(limit)
@@ -152,7 +152,7 @@ async function getCourseDirect(slug: string): Promise<any | null> {
   try {
     const { data, error } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, slug, title, subtitle, description, price, is_public, thumbnail_url_desktop, thumbnail_url_mobile, tags, created_at, updated_at')
       .eq('slug', slug)
       .eq('is_public', true)
       .single()

@@ -13,6 +13,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'api.ozean-licht.com',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'v5.airtableusercontent.com',
         port: '',
         pathname: '/**',

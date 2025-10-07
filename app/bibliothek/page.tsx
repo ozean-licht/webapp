@@ -3,14 +3,12 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { AppLayout } from '@/components/app-layout'
 import { SpanDesign } from '@/components/span-design'
+import { CourseListWithFilter } from '@/components/course-list-with-filter'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/badge'
 import { 
   BookOpen, 
   Play, 
-  Clock, 
-  Award,
   Sparkles,
   AlertCircle
 } from 'lucide-react'
@@ -147,73 +145,21 @@ export default async function BibliotheKPage() {
     <AppLayout breadcrumbs={[{ label: 'Bibliothek' }]}>
       <div className="p-6">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <SpanDesign>Meine Bibliothek</SpanDesign>
-        </div>
+        <div className="text-center space-y-5 mb-16">
+          <SpanDesign>Besuchte Kurse</SpanDesign>
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-cinzel-decorative font-normal text-foreground mb-4">
-            Deine Kurse
+          <h1 className="text-4xl md:text-6xl font-cinzel-decorative text-white leading-tight">
+            Deine Bibliothek
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+
+          <p className="text-lg md:text-xl max-w-3xl mx-auto text-pretty text-muted-foreground font-light">
             Setze deine spirituelle Reise fort und vertiefe dein Wissen mit deinen erworbenen Kursen
           </p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/20 rounded-lg">
-                <BookOpen className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-primary">{courses.length}</p>
-                <p className="text-sm text-muted-foreground">Kurse verfügbar</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-500/20 rounded-lg">
-                <Award className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-green-600">-</p>
-                <p className="text-sm text-muted-foreground">Abgeschlossen</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Clock className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-blue-600">-</p>
-                <p className="text-sm text-muted-foreground">Lernzeit</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-500/20 rounded-lg">
-                <Sparkles className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-purple-600">-</p>
-                <p className="text-sm text-muted-foreground">Fortschritt</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
         {/* Debug Info (nur wenn keine Kurse) */}
         {courses.length === 0 && (
-          <Card className="p-6 mb-8 bg-yellow-500/5 border-yellow-500/20">
+          <Card className="glass-card p-6 mb-8 bg-yellow-500/5 border-yellow-500/20">
             <div className="flex items-start gap-4">
               <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
@@ -244,7 +190,7 @@ export default async function BibliotheKPage() {
         {/* Content */}
         {courses.length === 0 ? (
           // Empty State
-          <Card className="p-12 text-center">
+          <Card className="glass-card-strong p-12 text-center">
             <div className="max-w-md mx-auto">
               <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <BookOpen className="h-10 w-10 text-primary" />
@@ -267,78 +213,8 @@ export default async function BibliotheKPage() {
             </div>
           </Card>
         ) : (
-          // Course Grid
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <p className="text-muted-foreground">
-                Hier findest du alle Kurse, die du erworben hast. Setze dein Lernen fort und vertiefe dein Wissen.
-              </p>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/courses">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Mehr Kurse
-                </Link>
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course: any) => (
-                <Card key={course.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-transparent group">
-                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
-                    {course.thumbnail_url_desktop ? (
-                      <img
-                        src={course.thumbnail_url_desktop}
-                        alt={course.title}
-                        className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <BookOpen className="h-16 w-16 text-primary/30" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity p-4">
-                      <Button asChild size="sm" className="gap-2">
-                        <Link href={`/courses/${course.slug}/learn`}>
-                          <Play className="h-4 w-4" />
-                          Weiter lernen
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                        {course.tags?.[0] || 'Kurs'}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        {course.source === 'ablefy' ? 'Legacy' : 'Neu'}
-                      </Badge>
-                    </div>
-                    
-                    <h3 className="font-medium mb-2 font-cinzel text-lg line-clamp-1">
-                      {course.title}
-                    </h3>
-                    
-                    {course.subtitle && (
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {course.subtitle}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-primary/10">
-                      <span>Erworben: {new Date(course.purchase_date).toLocaleDateString('de-DE')}</span>
-                      <Button asChild variant="ghost" size="sm" className="h-8 gap-2">
-                        <Link href={`/courses/${course.slug}`}>
-                          Details
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          // Course List with Filter - Same as /courses page
+          <CourseListWithFilter courses={courses} />
         )}
       </div>
     </AppLayout>

@@ -5,9 +5,10 @@ import { useParams } from 'next/navigation'
 import { AppLayout } from "@/components/app-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { VideoPlayer } from "@/components/video-player"
+import { UniversalVideoPlayer } from "@/components/universal-video-player"
 import {
   Play,
   Pause,
@@ -54,7 +55,7 @@ const mockCourseData: UserCourseProgress = {
             title: 'Willkommen bei den Sirianischen Lichtkodierungen',
             description: 'Eine Einführung in die sirianische Energiearbeit',
             content_type: 'video',
-            content_url: 'https://example.com/video1.mp4',
+            content_url: 'https://youtu.be/Yurty-cB3mo',
             order_index: 1,
             is_published: true,
             duration_minutes: 15,
@@ -106,7 +107,7 @@ const mockCourseData: UserCourseProgress = {
             title: 'Die 12 Lichtkodierungen verstehen',
             description: 'Detaillierte Erklärung der verschiedenen Lichtkodierungen',
             content_type: 'video',
-            content_url: 'https://example.com/video2.mp4',
+            content_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             order_index: 1,
             is_published: true,
             duration_minutes: 25,
@@ -158,7 +159,7 @@ const mockCourseData: UserCourseProgress = {
             title: 'Abschluss-Meditation',
             description: 'Finale Meditation zur Integration aller Lichtkodierungen',
             content_type: 'video',
-            content_url: 'https://example.com/final-meditation.mp4',
+            content_url: 'https://vimeo.com/148751763',
             order_index: 2,
             is_published: true,
             duration_minutes: 15,
@@ -257,11 +258,11 @@ export default function CourseLearnPage() {
 
   // Custom Sidebar für Kurs-Lernumgebung
   const customSidebar = (
-    <div className={`${sidebarCollapsed ? 'w-16' : 'w-80'} bg-[#0A1A1A] border-r border-primary/20 transition-all duration-300 flex flex-col`}>
+    <div className={`fixed left-0 top-[57px] bottom-0 ${sidebarCollapsed ? 'w-16' : 'w-80'} bg-[#0A1A1A] border-r border-primary/20 transition-all duration-300 flex flex-col z-40 overflow-y-auto`}>
       {/* Header */}
       <div className="p-4 border-b border-primary/20">
-        <div className="flex items-center justify-between">
-          <div className={`${sidebarCollapsed ? 'hidden' : 'block'}`}>
+        <div className="flex items-center justify-between gap-2">
+          <div className={`${sidebarCollapsed ? 'hidden' : 'block'} flex-1 min-w-0`}>
             <h2 className="text-white font-cinzel text-lg truncate">{courseData.course.title}</h2>
             <div className="flex items-center gap-2 mt-2">
               <Progress value={courseData.userCourse.progress_percentage} className="flex-1 h-2" />
@@ -272,7 +273,7 @@ export default function CourseLearnPage() {
             variant="ghost"
             size="sm"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="text-white/70 hover:text-white"
+            className="text-white/70 hover:text-white flex-shrink-0"
           >
             {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -371,44 +372,60 @@ export default function CourseLearnPage() {
         { label: courseData.course.title, href: `/courses/${slug}` },
         { label: 'Lernen' }
       ]}
+      className="!ml-0"
     >
-      <div className="flex flex-col h-[calc(100vh-73px)]">
+      <div className={`flex flex-col h-screen md:h-[calc(100vh-57px)] ${sidebarCollapsed ? 'ml-16' : 'ml-80'} transition-all duration-300`}>
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col">
           {/* Content Header */}
-          <div className="bg-[#0A1A1A] border-b border-primary/20 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-white text-2xl font-cinzel">{currentContent.title}</h1>
-                <p className="text-white/70 mt-1">{currentModule.title}</p>
+          <div className="bg-[#0A1A1A] border-b border-primary/20 p-4 md:p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-white text-xl md:text-2xl font-cinzel truncate">{currentContent.title}</h1>
+                <p className="text-white/70 mt-1 text-sm md:text-base truncate">{currentModule.title}</p>
               </div>
-              <div className="flex items-center gap-4">
-                <Badge variant="secondary" className="flex items-center gap-2">
+              <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+                <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/10 border border-white/20 text-white">
                   {getContentIcon(currentContent.content_type)}
-                  {currentContent.content_type.toUpperCase()}
-                </Badge>
-                <Badge variant="outline" className="text-primary border-primary/50">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {currentContent.duration_minutes} Min
-                </Badge>
+                  <span className="text-xs md:text-sm font-medium">{currentContent.content_type.toUpperCase()}</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-transparent border border-primary/50 text-primary">
+                  <Clock className="h-3 w-3" />
+                  <span className="text-xs md:text-sm font-medium">{currentContent.duration_minutes} Min</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Content Player */}
-          <div className="flex-1 bg-background">
+          <div className="flex-1 bg-gradient-to-br from-[#0A1A1A] via-background to-[#0A1A1A] overflow-y-auto">
             {currentContent.content_type === 'video' && (
-              <div className="h-full flex items-center justify-center bg-black">
-                <div className="text-center text-white">
-                  <Video className="h-24 w-24 mx-auto mb-4 text-primary/50" />
-                  <h3 className="text-xl mb-2">Video Player</h3>
-                  <p className="text-white/70 mb-4">Hier würde das Video abgespielt werden</p>
-                  <div className="flex items-center justify-center gap-4">
-                    <Button size="lg" className="bg-primary hover:bg-primary/90">
-                      <Play className="h-5 w-5 mr-2" />
-                      Abspielen
-                    </Button>
+              <div className="w-full h-full flex items-center justify-center p-4 md:p-8">
+                <div className="w-full max-w-6xl">
+                  {/* 16:9 Aspect Ratio Container with Border */}
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/10">
+                    <UniversalVideoPlayer
+                      url={currentContent.content_url || 'https://youtu.be/Yurty-cB3mo'}
+                      title={currentContent.title}
+                      onTimeUpdate={(time) => {
+                        // TODO: Progress tracking in Supabase
+                        console.log('Video progress:', time)
+                      }}
+                      onEnded={() => {
+                        // TODO: Mark content as completed
+                        console.log('Video completed!')
+                      }}
+                    />
                   </div>
+                  
+                  {/* Optional: Video Info below */}
+                  {currentContent.description && (
+                    <div className="mt-6 p-4 rounded-lg bg-[#0A1A1A] border border-primary/20">
+                      <p className="text-white/70 text-sm leading-relaxed">
+                        {currentContent.description}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -428,12 +445,22 @@ export default function CourseLearnPage() {
             )}
 
             {currentContent.content_type === 'pdf' && (
-              <div className="h-full flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                  <File className="h-24 w-24 mx-auto mb-4 text-primary/50" />
-                  <h3 className="text-xl mb-2 text-gray-800">PDF Dokument</h3>
-                  <p className="text-gray-600 mb-4">Hier würde das PDF angezeigt werden</p>
-                  <Button className="bg-primary hover:bg-primary/90">
+              <div className="h-full flex items-center justify-center bg-gradient-to-br from-[#0A1A1A] via-primary/10 to-primary/20 relative overflow-hidden">
+                {/* Mystischer Hintergrund-Effekt */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-primary/10"></div>
+                
+                {/* Glassmorphism Overlay */}
+                <div className="absolute inset-0 backdrop-blur-3xl opacity-30"></div>
+                
+                <div className="text-center relative z-10">
+                  <div className="w-32 h-32 bg-gradient-to-br from-primary/30 to-primary/10 rounded-full flex items-center justify-center mb-8 mx-auto backdrop-blur-sm border border-primary/30 shadow-2xl shadow-primary/20">
+                    <File className="h-16 w-16 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-cinzel text-white mb-4">PDF Dokument</h3>
+                  <p className="text-white/70 mb-8 max-w-md mx-auto">
+                    Lade dir das Arbeitsblatt herunter und vertiefe dein Wissen
+                  </p>
+                  <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105">
                     <File className="h-4 w-4 mr-2" />
                     Download PDF
                   </Button>
@@ -468,23 +495,23 @@ export default function CourseLearnPage() {
 
           {/* Navigation Footer */}
           <div className="bg-[#0A1A1A] border-t border-primary/20 p-4">
-            <div className="flex items-center justify-between max-w-4xl mx-auto">
-              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
+              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 w-full md:w-auto">
                 <ChevronLeft className="h-4 w-4 mr-2" />
                 Vorherige Lektion
               </Button>
 
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm">
+              <div className="flex items-center gap-2 md:gap-4">
+                <Button variant="outline" size="sm" className="hidden md:flex">
                   <Settings className="h-4 w-4" />
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90">
-                  Als abgeschlossen markieren
-                  <CheckCircle className="h-4 w-4 ml-2" />
+                <Button className="bg-primary hover:bg-primary/90 text-sm">
+                  <CheckCircle className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Als abgeschlossen markieren</span>
                 </Button>
               </div>
 
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="bg-primary hover:bg-primary/90 w-full md:w-auto">
                 Nächste Lektion
                 <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
